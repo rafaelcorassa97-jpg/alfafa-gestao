@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Gestão Alfafa — Pré-Secado</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;600&display=swap');
+  :root {
+    --verde-campo:#2D5016;--verde-claro:#4A7C2F;--verde-suave:#A8C97F;
+    --palha:#E8D5A0;--palha-escura:#C9B070;--fundo:#F5F0E8;
+    --fundo-card:#FDFAF4;--texto:#1C1A16;--texto-muted:#6B6455;--borda:#D4C89A;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Inter',sans-serif;background:var(--fundo);color:var(--texto);min-height:100vh;font-size:14px;}
+  header{background:var(--verde-campo);padding:18px 32px;display:flex;align-items:center;gap:16px;box-shadow:0 2px 12px rgba(0,0,0,0.18);}
+  .logo-icon{font-size:28px;}
+  header h1{font-family:'DM Serif Display',serif;color:var(--palha);font-size:1.5rem;}
+  header .sync-status{margin-left:auto;font-size:0.72rem;font-weight:500;letter-spacing:0.06em;text-transform:uppercase;padding:4px 10px;border-radius:20px;background:rgba(255,255,255,0.1);color:var(--verde-suave);}
+  header .sync-status.ok{color:#a8e6a0;}
+  header .sync-status.err{color:#f8b4b4;}
+  .tabs-bar{background:var(--verde-campo);border-top:1px solid rgba(255,255,255,0.08);display:flex;padding:0 32px;overflow-x:auto;}
+  .tab-btn{background:none;border:none;color:var(--verde-suave);font-family:'Inter',sans-serif;font-size:0.85rem;font-weight:500;letter-spacing:0.04em;padding:14px 20px;cursor:pointer;border-bottom:3px solid transparent;transition:color 0.2s,border-color 0.2s;white-space:nowrap;}
+  .tab-btn.active{color:var(--palha);border-bottom-color:var(--palha-escura);}
+  .tab-btn:hover:not(.active){color:#d4c89a;}
+  main{max-width:1100px;margin:0 auto;padding:32px 24px;}
+  .tab-panel{display:none;}.tab-panel.active{display:block;}
+  .section-title{font-family:'DM Serif Display',serif;font-size:1.2rem;color:var(--verde-campo);margin-bottom:6px;}
+  .section-sub{color:var(--texto-muted);font-size:0.82rem;margin-bottom:24px;}
+  .card{background:var(--fundo-card);border:1px solid var(--borda);border-radius:10px;padding:24px;margin-bottom:20px;}
+  .card h3{font-size:0.9rem;font-weight:600;color:var(--verde-claro);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:16px;border-bottom:1px solid var(--borda);padding-bottom:8px;}
+  .form-row{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:12px;align-items:flex-end;}
+  .form-group{display:flex;flex-direction:column;gap:4px;flex:1;min-width:140px;}
+  label{font-size:0.75rem;font-weight:500;color:var(--texto-muted);text-transform:uppercase;letter-spacing:0.05em;}
+  input,select,textarea{font-family:'Inter',sans-serif;font-size:0.9rem;background:var(--fundo);border:1px solid var(--borda);border-radius:6px;padding:8px 12px;color:var(--texto);transition:border-color 0.2s;width:100%;}
+  input:focus,select:focus{outline:none;border-color:var(--verde-claro);}
+  .btn{font-family:'Inter',sans-serif;font-size:0.85rem;font-weight:600;border:none;border-radius:6px;padding:9px 20px;cursor:pointer;transition:background 0.18s,transform 0.1s;white-space:nowrap;}
+  .btn:active{transform:scale(0.97);}
+  .btn-primary{background:var(--verde-claro);color:#fff;}
+  .btn-primary:hover{background:var(--verde-campo);}
+  .btn-danger{background:#c0392b;color:#fff;padding:5px 10px;font-size:0.78rem;}
+  .btn-sm{padding:5px 12px;font-size:0.78rem;}
+  .btn-outline{background:transparent;border:1px solid var(--verde-claro);color:var(--verde-claro);}
+  .btn-outline:hover{background:var(--verde-claro);color:#fff;}
+  .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:20px;}
+  .stat-card{background:var(--verde-campo);border-radius:10px;padding:18px 20px;color:var(--palha);}
+  .stat-card .val{font-family:'DM Serif Display',serif;font-size:1.6rem;line-height:1;color:#fff;}
+  .stat-card .lbl{font-size:0.72rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--verde-suave);margin-top:4px;}
+  .mono{font-family:'JetBrains Mono',monospace;font-size:0.85rem;}
+  /* ESTOQUE */
+  .insumos-grid{display:flex;flex-direction:column;gap:0;margin-top:4px;border:1px solid var(--borda);border-radius:8px;overflow:hidden;}
+  .insumo-card{background:var(--fundo-card);border-bottom:1px solid var(--borda);padding:10px 14px;display:flex;align-items:center;gap:12px;position:relative;}
+  .insumo-card:last-child{border-bottom:none;}
+  .insumo-card:hover{background:rgba(168,201,127,0.1);}
+  .insumo-card .ic-nome{font-weight:500;font-size:0.88rem;color:var(--texto);flex:1;}
+  .insumo-card .ic-qty{font-family:'JetBrains Mono',monospace;font-size:0.95rem;color:var(--verde-campo);font-weight:700;}
+  .insumo-card .ic-unit{font-size:0.75rem;color:var(--texto-muted);text-transform:uppercase;letter-spacing:0.04em;min-width:24px;}
+  .insumo-card .ic-del{background:none;border:none;color:var(--texto-muted);cursor:pointer;font-size:0.75rem;padding:2px 4px;border-radius:3px;opacity:0;transition:opacity 0.15s;line-height:1;}
+  .insumo-card:hover .ic-del{opacity:1;}
+  .insumo-card .ic-del:hover{color:#c0392b;}
+  .insumo-card .ic-adj{font-size:0.72rem;color:var(--verde-claro);background:none;border:none;cursor:pointer;padding:0;font-family:inherit;text-decoration:underline;text-underline-offset:2px;white-space:nowrap;opacity:0;transition:opacity 0.15s;}
+  .insumo-card:hover .ic-adj{opacity:1;}
+  /* LOTES */
+  .lotes-table{width:100%;border-collapse:collapse;font-size:0.78rem;}
+  .lotes-table thead tr{background:var(--verde-campo);color:var(--palha);}
+  .lotes-table th{padding:8px 10px;text-align:left;font-size:0.68rem;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;white-space:nowrap;}
+  .lotes-table td{padding:7px 10px;border-bottom:1px solid var(--borda);vertical-align:top;}
+  .lotes-table tr:nth-child(even) td{background:rgba(168,201,127,0.07);}
+  .lotes-table tr:hover td{background:rgba(168,201,127,0.15);}
+  .lotes-table td:first-child{white-space:normal;min-width:140px;}
+  .lotes-table td{white-space:nowrap;}
+  .lt-cell{cursor:default;}
+  /* CHUVAS */
+  .rain-year-nav{display:flex;align-items:center;gap:16px;margin-bottom:20px;}
+  .rain-year-nav h2{font-family:'DM Serif Display',serif;font-size:1.4rem;color:var(--verde-campo);min-width:60px;text-align:center;}
+  .months-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px;}
+  .month-card{background:var(--fundo-card);border:1px solid var(--borda);border-radius:10px;overflow:hidden;}
+  .month-title{background:var(--verde-claro);color:#fff;font-size:0.82rem;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;padding:8px 14px;display:flex;justify-content:space-between;align-items:center;}
+  .month-total{font-family:'JetBrains Mono',monospace;font-size:0.88rem;color:var(--palha);}
+  .days-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;padding:8px;}
+  .day-cell{display:flex;flex-direction:column;align-items:center;gap:2px;padding:4px 2px;}
+  .day-label{font-size:0.62rem;color:var(--texto-muted);font-weight:600;}
+  .day-cell input{width:100%;padding:4px 2px;text-align:center;font-family:'JetBrains Mono',monospace;font-size:0.82rem;border-radius:4px;border:1px solid var(--borda);background:var(--fundo);}
+  .day-cell input:focus{border-color:var(--verde-claro);background:#fff;}
+  .day-cell input.has-rain{background:rgba(90,160,60,0.13);border-color:var(--verde-suave);}
+  .weekday-hdr{font-size:0.62rem;font-weight:700;color:var(--texto-muted);text-align:center;padding:4px 0;text-transform:uppercase;}
+  .totals-bar{display:flex;gap:24px;flex-wrap:wrap;background:var(--verde-campo);border-radius:10px;padding:16px 24px;margin-bottom:20px;}
+  .totals-bar .t-val{font-family:'JetBrains Mono',monospace;font-size:1.25rem;color:var(--palha);font-weight:600;}
+  .totals-bar .t-lbl{font-size:0.68rem;color:var(--verde-suave);text-transform:uppercase;letter-spacing:0.06em;}
+  .rain-chart{display:flex;align-items:flex-end;gap:6px;height:100px;margin-bottom:20px;background:var(--fundo-card);border:1px solid var(--borda);border-radius:10px;padding:12px 16px 8px;}
+  .rain-bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;height:100%;justify-content:flex-end;}
+  .rain-bar{width:100%;background:var(--verde-suave);border-radius:3px 3px 0 0;transition:height 0.4s ease;min-height:2px;}
+  .rain-bar-lbl{font-size:0.58rem;color:var(--texto-muted);text-transform:uppercase;font-weight:600;}
+  .empty-state{text-align:center;color:var(--texto-muted);padding:32px;font-size:0.9rem;font-style:italic;}
+  /* SETUP FIREBASE */
+  #setup-screen{position:fixed;inset:0;background:var(--fundo);z-index:1000;display:flex;align-items:center;justify-content:center;padding:24px;}
+  .setup-card{background:var(--fundo-card);border:1px solid var(--borda);border-radius:14px;padding:36px;max-width:520px;width:100%;}
+  .setup-card h2{font-family:'DM Serif Display',serif;font-size:1.6rem;color:var(--verde-campo);margin-bottom:8px;}
+  .setup-card p{color:var(--texto-muted);font-size:0.85rem;line-height:1.6;margin-bottom:20px;}
+  .setup-card .step{background:var(--fundo);border:1px solid var(--borda);border-radius:8px;padding:14px 16px;margin-bottom:12px;font-size:0.82rem;line-height:1.7;}
+  .setup-card .step strong{color:var(--verde-campo);}
+  .setup-card code{background:#e8f5e9;color:var(--verde-campo);padding:1px 5px;border-radius:3px;font-family:'JetBrains Mono',monospace;font-size:0.8rem;}
+  @media(max-width:600px){header{padding:14px 16px;}main{padding:20px 12px;}.tabs-bar{padding:0 8px;}.tab-btn{padding:12px 10px;font-size:0.78rem;}.months-grid{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+
+<!-- TELA DE CONFIGURAÇÃO FIREBASE -->
+<div id="setup-screen" style="display:none">
+  <div class="setup-card">
+    <h2>🌿 Configurar Sincronização</h2>
+    <p>Para que Rafael, Felipe e Reinaldo vejam os dados em tempo real, é necessário conectar ao Firebase (gratuito). Siga os passos abaixo uma única vez:</p>
+    <div class="step"><strong>1.</strong> Acesse <code>console.firebase.google.com</code> e crie um projeto (ex: <em>alfafa-gestao</em>)</div>
+    <div class="step"><strong>2.</strong> No projeto, vá em <strong>Firestore Database</strong> → Criar banco → Modo de teste</div>
+    <div class="step"><strong>3.</strong> Vá em <strong>Configurações do projeto</strong> → Seus aplicativos → Web (<code>&lt;/&gt;</code>) → Registrar app</div>
+    <div class="step"><strong>4.</strong> Copie o <code>apiKey</code>, <code>projectId</code> e <code>appId</code> e cole abaixo:</div>
+    <div class="form-group" style="margin-bottom:10px"><label>API Key</label><input type="text" id="fb-apikey" placeholder="AIzaSy..." /></div>
+    <div class="form-group" style="margin-bottom:10px"><label>Project ID</label><input type="text" id="fb-projectid" placeholder="alfafa-gestao" /></div>
+    <div class="form-group" style="margin-bottom:20px"><label>App ID</label><input type="text" id="fb-appid" placeholder="1:123456:web:abc..." /></div>
+    <button class="btn btn-primary" style="width:100%" onclick="salvarConfig()">Conectar e Salvar</button>
+    <p style="margin-top:12px;font-size:0.75rem;text-align:center">Esta configuração fica salva no navegador de cada pessoa. Todos devem fazer isso uma vez.</p>
+  </div>
+</div>
+
+<header>
+  <div class="logo-icon">🌿</div>
+  <h1>Gestão Alfafa</h1>
+  <span class="sync-status" id="sync-status">⏳ Conectando...</span>
+</header>
+
+<div class="tabs-bar">
+  <button class="tab-btn active" onclick="showTab('estoque',this)">📦 Estoque</button>
+  <button class="tab-btn" onclick="showTab('lotes',this)">🎯 Lotes</button>
+  <button class="tab-btn" onclick="showTab('pulv',this)">🚜 Pulverizações</button>
+  <button class="tab-btn" onclick="showTab('chuvas',this)">🌧️ Chuvas</button>
+</div>
+
+<main>
+
+<!-- ESTOQUE -->
+<div id="tab-estoque" class="tab-panel active">
+  <div class="section-title">Estoque de Insumos</div>
+  <p class="section-sub">Produtos, quantidades e unidades disponíveis na fazenda.</p>
+  <div class="stats-grid">
+    <div class="stat-card"><div class="val" id="st-total">0</div><div class="lbl">Itens Cadastrados</div></div>
+  </div>
+  <div class="card">
+    <h3>Adicionar Insumo</h3>
+    <div class="form-row">
+      <div class="form-group" style="flex:3"><label>Produto</label><input type="text" id="ins-nome" placeholder="Ex: Ureia 46%, Herbicida X..." /></div>
+      <div class="form-group"><label>Quantidade</label><input type="number" id="ins-qty" placeholder="0" min="0" step="0.01" /></div>
+      <div class="form-group"><label>Unidade</label>
+        <select id="ins-unit"><option>kg</option><option>ton</option><option>L</option><option>sc</option><option>un</option><option>cx</option></select>
+      </div>
+      <div class="form-group" style="justify-content:flex-end"><button class="btn btn-primary" onclick="addInsumo()">+ Adicionar</button></div>
+    </div>
+  </div>
+  <div id="estoque-cards-wrap"></div>
+</div>
+
+<!-- LOTES -->
+<div id="tab-lotes" class="tab-panel">
+  <div class="section-title">Controle de Lotes</div>
+  <p class="section-sub">Registre cada lote de pré-secado com a quantidade de bolas e o peso médio.</p>
+  <div class="stats-grid">
+    <div class="stat-card"><div class="val" id="lt-lotes">0</div><div class="lbl">Lotes Cadastrados</div></div>
+    <div class="stat-card"><div class="val" id="lt-bolas">0</div><div class="lbl">Total de Bolas</div></div>
+    <div class="stat-card"><div class="val" id="lt-media">—</div><div class="lbl">Peso Médio (kg)</div></div>
+  </div>
+  <div class="card">
+    <h3>Novo Lote</h3>
+    <div class="form-row">
+      <div class="form-group"><label>Nº / Nome do Lote</label><input type="text" id="lt-nome" placeholder="Ex: Lote 01 — Jun/25" /></div>
+      <div class="form-group"><label>Data do Corte</label><input type="date" id="lt-data" /></div>
+      <div class="form-group"><label>Nº de Corte</label><input type="number" id="lt-corte" placeholder="1" min="1" /></div>
+      <div class="form-group"><label>Talhão / Área</label><input type="text" id="lt-talhao" placeholder="Ex: Talhão A" /></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Qtd de Bolas</label><input type="number" id="lt-nbolas" placeholder="Ex: 120" min="1" /></div>
+      <div class="form-group"><label>Peso Médio por Bola (kg)</label><input type="number" id="lt-pesomed" placeholder="Ex: 350" min="0" step="0.1" /></div>
+      <div class="form-group"><label>Observações</label><input type="text" id="lt-obs" placeholder="Condições, qualidade..." /></div>
+      <div class="form-group" style="justify-content:flex-end"><button class="btn btn-primary" onclick="addLote()">+ Criar Lote</button></div>
+    </div>
+  </div>
+  <div id="lotes-list"><div class="empty-state">Nenhum lote cadastrado ainda.</div></div>
+</div>
+
+<!-- PULVERIZAÇÕES -->
+<div id="tab-pulv" class="tab-panel">
+  <div class="section-title">Controle de Pulverizações</div>
+  <p class="section-sub">Registro de aplicações — data, produtos, dose e vazão.</p>
+  <div class="card">
+    <h3>Nova Aplicação</h3>
+    <div class="form-row">
+      <div class="form-group" style="max-width:130px;min-width:110px;flex:0 0 130px"><label>Data</label><input type="date" id="pv-data" /></div>
+      <div class="form-group" style="flex:3"><label>Produto(s) Utilizado(s)</label><input type="text" id="pv-produto" placeholder="Ex: Glifosato, Lorsban..." /></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Dose</label><input type="text" id="pv-dose" placeholder="Ex: 2 L/ha" /></div>
+      <div class="form-group"><label>Vazão</label><input type="text" id="pv-vazao" placeholder="Ex: 150 L/ha" /></div>
+      <div class="form-group" style="justify-content:flex-end"><button class="btn btn-primary" onclick="addPulv()">+ Registrar</button></div>
+    </div>
+  </div>
+  <div id="pulv-list"><div class="empty-state">Nenhuma aplicação registrada ainda.</div></div>
+</div>
+
+<!-- CHUVAS -->
+<div id="tab-chuvas" class="tab-panel">
+  <div class="section-title">Pluviometria — Lavoura</div>
+  <p class="section-sub">Registre a chuva diária em mm. Acompanhe o acumulado mensal e anual.</p>
+  <div class="rain-year-nav">
+    <button class="btn btn-outline btn-sm" onclick="changeYear(-1)">◀</button>
+    <h2 id="rain-year">2025</h2>
+    <button class="btn btn-outline btn-sm" onclick="changeYear(1)">▶</button>
+    <span style="margin-left:auto;font-size:0.82rem;color:var(--texto-muted)">Clique nos campos para inserir mm</span>
+  </div>
+  <div class="totals-bar">
+    <div class="t-item"><div class="t-val" id="rt-anual">0</div><div class="t-lbl">mm Ano</div></div>
+    <div class="t-item"><div class="t-val" id="rt-mes">0</div><div class="t-lbl">mm Mês Atual</div></div>
+    <div class="t-item"><div class="t-val" id="rt-diasc">0</div><div class="t-lbl">Dias com Chuva</div></div>
+    <div class="t-item"><div class="t-val" id="rt-maximo">0</div><div class="t-lbl">Maior Evento (mm)</div></div>
+  </div>
+  <div class="rain-chart" id="rain-bar-chart"></div>
+  <div class="months-grid" id="months-grid"></div>
+</div>
+
+</main>
+
+<!-- Firebase SDKs -->
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot, serverTimestamp }
+  from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+// ── CONFIG ──────────────────────────────────────────────
+const LS_CONFIG_KEY = 'alfafa_fb_config';
+
+function getConfig() {
+  try { return JSON.parse(localStorage.getItem(LS_CONFIG_KEY)); } catch(e) { return null; }
+}
+
+window.salvarConfig = function() {
+  const cfg = {
+    apiKey:    document.getElementById('fb-apikey').value.trim(),
+    projectId: document.getElementById('fb-projectid').value.trim(),
+    appId:     document.getElementById('fb-appid').value.trim(),
+    authDomain: document.getElementById('fb-projectid').value.trim() + '.firebaseapp.com',
+    storageBucket: document.getElementById('fb-projectid').value.trim() + '.appspot.com',
+    messagingSenderId: '460178234444',
+  };
+  if (!cfg.apiKey || !cfg.projectId || !cfg.appId) { alert('Preencha todos os campos.'); return; }
+  localStorage.setItem(LS_CONFIG_KEY, JSON.stringify(cfg));
+  location.reload();
+};
+
+// ── LOCAL STORAGE FALLBACK ───────────────────────────────
+const LS = {
+  get: k => { try { return JSON.parse(localStorage.getItem(k)); } catch(e) { return null; } },
+  set: (k, v) => localStorage.setItem(k, JSON.stringify(v)),
+};
+
+function setStatus(txt, cls) {
+  const el = document.getElementById('sync-status');
+  if (!el) return;
+  el.textContent = txt;
+  el.className = 'sync-status ' + (cls || '');
+}
+
+// Credenciais Firebase já configuradas
+const FIREBASE_CFG = {
+  apiKey: "AIzaSyC3TgtAAa7QaCZavCeQ6ooMxzHnXDENNHA",
+  authDomain: "alfafagestao.firebaseapp.com",
+  databaseURL: "https://alfafagestao-default-rtdb.firebaseio.com",
+  projectId: "alfafagestao",
+  storageBucket: "alfafagestao.firebasestorage.app",
+  messagingSenderId: "460178234444",
+  appId: "1:460178234444:web:74be3254797695daef68e9",
+  measurementId: "G-B723VCZ47D"
+};
+
+// Tenta Firebase com timeout de 8 segundos, fallback para local
+let firebaseOk = false;
+const app = initializeApp(FIREBASE_CFG);
+const db  = getFirestore(app);
+
+// Timeout fallback
+const fbTimeout = setTimeout(() => {
+  if (!firebaseOk) {
+    console.warn('Firebase timeout, usando modo local');
+    setStatus('📱 Modo Local', '');
+    initLocal();
+  }
+}, 8000);
+
+// Testa conexão com uma leitura simples
+import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js').then(fs => {
+  const testCol = fs.collection(db, '_ping');
+  const unsub = fs.onSnapshot(testCol, () => {
+    if (!firebaseOk) {
+      firebaseOk = true;
+      clearTimeout(fbTimeout);
+      unsub();
+      setStatus('✓ Sincronizado', 'ok');
+      initFirebase(db);
+    }
+  }, (err) => {
+    clearTimeout(fbTimeout);
+    console.warn('Firebase erro:', err);
+    setStatus('📱 Modo Local', '');
+    initLocal();
+  });
+});
+
+// ══════════════════════════════════════════════════════════
+// MODO LOCAL (localStorage)
+// ══════════════════════════════════════════════════════════
+function initLocal() {
+  let insumos  = LS.get('insumos')  || [];
+  let lotes    = LS.get('lotes')    || [];
+  let pulvs    = LS.get('pulvs')    || [];
+  let rainData = LS.get('rainData') || {};
+  let rainYear = new Date().getFullYear();
+
+  const MONTHS = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+  const WDAYS  = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+
+  window.showTab = function(id, btn) {
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-' + id).classList.add('active');
+    if (btn) btn.classList.add('active');
+    if (id === 'chuvas') renderChuvas();
+    if (id === 'lotes')  renderLotes();
+    if (id === 'estoque') renderEstoque();
+    if (id === 'pulv')   renderPulv();
+  };
+
+  // ESTOQUE
+  window.addInsumo = function() {
+    const nome = document.getElementById('ins-nome').value.trim();
+    const qty  = parseFloat(document.getElementById('ins-qty').value) || 0;
+    const unit = document.getElementById('ins-unit').value;
+    if (!nome) { alert('Informe o nome do produto.'); return; }
+    insumos.push({ id: Date.now(), nome, qty, unit });
+    LS.set('insumos', insumos);
+    ['ins-nome','ins-qty'].forEach(k => document.getElementById(k).value = '');
+    renderEstoque();
+  };
+  window.removeInsumo = function(id) {
+    if (!confirm('Remover?')) return;
+    insumos = insumos.filter(i => String(i.id) !== String(id));
+    LS.set('insumos', insumos);
+    renderEstoque();
+  };
+  window.updateQty = function(id) {
+    const ins = insumos.find(i => String(i.id) === String(id));
+    if (!ins) return;
+    const card = document.getElementById('card-' + id);
+    const qtyEl = card.querySelector('.ic-qty');
+    const adjBtn = card.querySelector('.ic-adj');
+    adjBtn.style.display = 'none';
+    qtyEl.innerHTML = `<input id="qty-edit-${id}" type="number" step="0.01" value="${ins.qty}"
+      style="width:70px;font-family:inherit;font-size:0.9rem;font-weight:700;color:var(--verde-campo);border:1px solid var(--verde-claro);border-radius:4px;padding:2px 6px;background:var(--fundo-card);"
+      onkeydown="if(event.key==='Enter')window.saveQty('${id}');if(event.key==='Escape')window.renderEstoque();"
+      onblur="window.saveQty('${id}')" />`;
+    document.getElementById('qty-edit-' + id).focus();
+    document.getElementById('qty-edit-' + id).select();
+  };
+  window.saveQty = function(id) {
+    const input = document.getElementById('qty-edit-' + id);
+    if (!input) return;
+    const v = parseFloat(input.value);
+    const ins = insumos.find(i => String(i.id) === String(id));
+    if (!isNaN(v) && ins) { ins.qty = Math.max(0, v); LS.set('insumos', insumos); }
+    renderEstoque();
+  };
+  function renderEstoque() {
+    document.getElementById('st-total').textContent = insumos.length;
+    const wrap = document.getElementById('estoque-cards-wrap');
+    if (insumos.length === 0) { wrap.innerHTML = '<div class="empty-state">Nenhum produto cadastrado. Adicione acima para começar.</div>'; return; }
+    wrap.innerHTML = `<div class="insumos-grid">${insumos.map(i => `
+      <div class="insumo-card" id="card-${i.id}">
+        <div class="ic-nome">${i.nome}</div>
+        <span class="ic-qty">${(+i.qty).toLocaleString('pt-BR',{maximumFractionDigits:2})}</span>
+        <span class="ic-unit">${i.unit}</span>
+        <button class="ic-adj" onclick="window.updateQty('${i.id}')">± ajustar</button>
+        <button class="ic-del" onclick="window.removeInsumo('${i.id}')" title="Remover">✕</button>
+      </div>`).join('')}</div>`;
+  }
+  window.renderEstoque = renderEstoque;
+
+  // LOTES
+  window.addLote = function() {
+    const nome    = document.getElementById('lt-nome').value.trim();
+    const data    = document.getElementById('lt-data').value;
+    const corte   = parseInt(document.getElementById('lt-corte').value) || 1;
+    const talhao  = document.getElementById('lt-talhao').value.trim();
+    const nbolas  = parseInt(document.getElementById('lt-nbolas').value) || 0;
+    const pesomed = parseFloat(document.getElementById('lt-pesomed').value) || 0;
+    const obs     = document.getElementById('lt-obs').value.trim();
+    if (!nome) { alert('Informe o nome/número do lote.'); return; }
+    if (nbolas < 1) { alert('Informe a quantidade de bolas.'); return; }
+    const id = Date.now();
+    lotes.unshift({ id, nome, data, corte, talhao, nbolas, pesomed, obs });
+    LS.set('lotes', lotes);
+    ['lt-nome','lt-data','lt-corte','lt-talhao','lt-nbolas','lt-pesomed','lt-obs'].forEach(k => document.getElementById(k).value = '');
+    renderLotes();
+  };
+  window.removeLote = function(id) {
+    if (!confirm('Remover este lote?')) return;
+    lotes = lotes.filter(l => String(l.id) !== String(id));
+    LS.set('lotes', lotes);
+    renderLotes();
+  };
+  window.updateLoteField = function(id, field, val) {
+    const lote = lotes.find(l => String(l.id) === String(id));
+    if (!lote) return;
+    if (field === 'nbolas') lote.nbolas = parseInt(val) || 0;
+    else if (field === 'pesomed') lote.pesomed = parseFloat(val) || 0;
+    else if (field === 'corte') lote.corte = parseInt(val) || 1;
+    else lote[field] = val;
+    LS.set('lotes', lotes);
+    renderLotes();
+  };
+  window.startEdit = function(td, id, field, type) {
+    if (td.querySelector('input')) return;
+    const lote = lotes.find(l => String(l.id) === String(id));
+    const cur = lote ? lote[field] : '';
+    const display = td.querySelector('.lt-display');
+    const inp = document.createElement('input');
+    inp.type = type || 'text';
+    if (type === 'number') { inp.step = field === 'pesomed' ? '0.1' : '1'; inp.min = '0'; }
+    inp.value = cur || '';
+    inp.style.cssText = 'font-family:inherit;font-size:0.87rem;border:1px solid var(--verde-claro);border-radius:4px;padding:3px 6px;width:100%;background:#fff;color:var(--texto);outline:none';
+    if (display) display.style.display = 'none';
+    td.appendChild(inp); inp.focus(); if (inp.select) inp.select();
+    const done = () => { window.updateLoteField(id, field, inp.value); };
+    inp.addEventListener('blur', done);
+    inp.addEventListener('keydown', e => { if (e.key==='Enter') inp.blur(); if (e.key==='Escape') { inp.removeEventListener('blur',done); renderLotes(); } });
+  };
+  function updateLoteTotals() {
+    let totalBolas=0, somaMedia=0, countMedia=0;
+    lotes.forEach(l => { totalBolas+=l.nbolas||0; if(l.pesomed){somaMedia+=+l.pesomed;countMedia++;} });
+    document.getElementById('lt-lotes').textContent = lotes.length;
+    document.getElementById('lt-bolas').textContent = totalBolas;
+    document.getElementById('lt-media').textContent = countMedia ? (somaMedia/countMedia).toFixed(1) : '—';
+  }
+  function renderLotes() {
+    updateLoteTotals();
+    const wrap = document.getElementById('lotes-list');
+    if (lotes.length === 0) { wrap.innerHTML = '<div class="empty-state">Nenhum lote cadastrado ainda.</div>'; return; }
+    const fmtDate = v => v ? new Date(v+'T00:00').toLocaleDateString('pt-BR') : '—';
+    wrap.innerHTML = `
+      <div class="lotes-mobile">
+        ${lotes.map(l => `
+        <div class="lote-card">
+          <div class="lote-card-header">
+            <div class="lote-card-nome lt-cell" ondblclick="window.startEdit(this,'${l.id}','nome','text')">${l.nome||'—'}</div>
+            <button class="btn btn-danger" onclick="window.removeLote('${l.id}')">✕</button>
+          </div>
+          <div class="lote-card-grid">
+            <div class="lote-card-item lt-cell" ondblclick="window.startEdit(this,'${l.id}','data','date')">
+              <label>Data</label><span class="lt-display">${fmtDate(l.data)}</span>
+            </div>
+            <div class="lote-card-item lt-cell" ondblclick="window.startEdit(this,'${l.id}','corte','number')">
+              <label>Corte</label><span class="lt-display">${l.corte||1}º</span>
+            </div>
+            <div class="lote-card-item lt-cell" ondblclick="window.startEdit(this,'${l.id}','talhao','text')">
+              <label>Talhão</label><span class="lt-display">${l.talhao||'—'}</span>
+            </div>
+            <div class="lote-card-item lt-cell" ondblclick="window.startEdit(this,'${l.id}','nbolas','number')">
+              <label>Bolas</label><span class="lt-display">${l.nbolas||'—'}</span>
+            </div>
+            <div class="lote-card-item lt-cell" ondblclick="window.startEdit(this,'${l.id}','pesomed','number')">
+              <label>Peso Médio (kg)</label><span class="lt-display" style="color:var(--verde-campo);font-weight:700">${l.pesomed||'—'}</span>
+            </div>
+          </div>
+          ${l.obs
+            ? `<div class="lote-card-obs lt-cell" ondblclick="window.startEdit(this,'${l.id}','obs','text')"><strong>Obs:</strong> ${l.obs}</div>`
+            : `<div class="lote-card-obs lt-cell" style="color:var(--borda)" ondblclick="window.startEdit(this,'${l.id}','obs','text')">+ obs</div>`}
+        </div>`).join('')}
+        <div style="font-size:0.72rem;color:var(--texto-muted);text-align:center;padding:4px">Duplo toque em qualquer campo para editar</div>
+      </div>
+      <div class="lotes-desktop">
+        <div style="border:1px solid var(--borda);border-radius:8px;overflow:hidden">
+          <div style="overflow-x:auto">
+            <table class="lotes-table" style="min-width:580px">
+              <thead><tr>
+                <th>Lote</th><th>Data</th><th>Corte</th><th>Talhão</th>
+                <th style="text-align:right">Bolas</th>
+                <th style="text-align:right">Peso Médio (kg)</th>
+                <th></th>
+              </tr></thead>
+              <tbody>
+                ${lotes.map(l => `
+                <tr style="vertical-align:top">
+                  <td class="lt-cell" ondblclick="window.startEdit(this,'${l.id}','nome','text')">
+                    <span class="lt-display" style="font-weight:600">${l.nome||'—'}</span>
+                    ${l.obs
+                      ? `<div style="font-size:0.74rem;color:var(--texto-muted);margin-top:19px" ondblclick="event.stopPropagation();window.startEdit(this.closest('td'),'${l.id}','obs','text')"><strong>Obs:</strong> ${l.obs}</div>`
+                      : `<div style="font-size:0.74rem;color:var(--borda);margin-top:19px" ondblclick="event.stopPropagation();window.startEdit(this.closest('td'),'${l.id}','obs','text')">+ obs</div>`}
+                  </td>
+                  <td class="lt-cell" style="vertical-align:top" ondblclick="window.startEdit(this,'${l.id}','data','date')"><span class="lt-display">${fmtDate(l.data)}</span></td>
+                  <td class="lt-cell" style="text-align:center;vertical-align:top" ondblclick="window.startEdit(this,'${l.id}','corte','number')"><span class="lt-display">${l.corte||1}º</span></td>
+                  <td class="lt-cell" style="vertical-align:top" ondblclick="window.startEdit(this,'${l.id}','talhao','text')"><span class="lt-display">${l.talhao||'—'}</span></td>
+                  <td class="lt-cell" style="text-align:right;vertical-align:top" ondblclick="window.startEdit(this,'${l.id}','nbolas','number')"><span class="lt-display" style="font-family:'JetBrains Mono',monospace">${l.nbolas||'—'}</span></td>
+                  <td class="lt-cell" style="text-align:right;vertical-align:top" ondblclick="window.startEdit(this,'${l.id}','pesomed','number')"><span class="lt-display" style="font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--verde-campo)">${l.pesomed||'—'}</span></td>
+                  <td><button class="btn btn-danger" onclick="window.removeLote('${l.id}')">✕</button></td>
+                </tr>`).join('')}
+              </tbody>
+            </table>
+          </div>
+          <div style="padding:8px 14px;font-size:0.72rem;color:var(--texto-muted);border-top:1px solid var(--borda);background:var(--fundo)">
+            Duplo toque em qualquer campo para editar
+          </div>
+        </div>
+      </div>`;
+  }
+  window.renderLotes = renderLotes;
+
+  // PULVERIZAÇÕES
+  window.addPulv = function() {
+    const data    = document.getElementById('pv-data').value;
+    const produto = document.getElementById('pv-produto').value.trim();
+    const dose    = document.getElementById('pv-dose').value.trim();
+    const vazao   = document.getElementById('pv-vazao').value.trim();
+    if (!data || !produto) { alert('Informe a data e o produto.'); return; }
+    pulvs.unshift({ id: Date.now(), data, produto, dose, vazao });
+    LS.set('pulvs', pulvs);
+    ['pv-produto','pv-dose','pv-vazao'].forEach(k => document.getElementById(k).value = '');
+    renderPulv();
+  };
+  window.removePulv = function(id) {
+    if (!confirm('Remover?')) return;
+    pulvs = pulvs.filter(p => String(p.id) !== String(id));
+    LS.set('pulvs', pulvs);
+    renderPulv();
+  };
+  function renderPulv() {
+    const wrap = document.getElementById('pulv-list');
+    if (!wrap) return;
+    if (pulvs.length === 0) { wrap.innerHTML = '<div class="empty-state">Nenhuma aplicação registrada ainda.</div>'; return; }
+    wrap.innerHTML = `
+      <div style="border:1px solid var(--borda);border-radius:8px;overflow:hidden">
+        <table style="width:100%;border-collapse:collapse;font-size:0.87rem">
+          <thead><tr style="background:var(--verde-campo);color:var(--palha)">
+            <th style="padding:10px 14px;font-size:0.72rem;letter-spacing:0.05em;text-transform:uppercase">Data</th>
+            <th style="padding:10px 14px;font-size:0.72rem;letter-spacing:0.05em;text-transform:uppercase">Produto(s)</th>
+            <th style="padding:10px 14px;font-size:0.72rem;letter-spacing:0.05em;text-transform:uppercase">Dose</th>
+            <th style="padding:10px 14px;font-size:0.72rem;letter-spacing:0.05em;text-transform:uppercase">Vazão</th>
+            <th></th>
+          </tr></thead>
+          <tbody>
+            ${pulvs.map((p,i) => `
+            <tr style="${i%2===1?'background:rgba(168,201,127,0.07)':''}">
+              <td style="padding:9px 10px;white-space:nowrap;color:var(--texto-muted);font-size:0.78rem;width:80px">${p.data ? new Date(p.data+'T00:00').toLocaleDateString('pt-BR') : '—'}</td>
+              <td style="padding:9px 14px;font-weight:500">${p.produto}</td>
+              <td style="padding:9px 14px;font-family:'JetBrains Mono',monospace;font-size:0.85rem">${p.dose||'—'}</td>
+              <td style="padding:9px 14px;font-family:'JetBrains Mono',monospace;font-size:0.85rem">${p.vazao||'—'}</td>
+              <td style="padding:9px 14px"><button class="btn btn-danger" onclick="window.removePulv('${p.id}')">✕</button></td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>`;
+  }
+  window.renderPulv = renderPulv;
+
+  // CHUVAS
+  window.changeYear = function(d) { rainYear += d; renderChuvas(); };
+  window.setRain = function(y, m, day, val) {
+    const k = `${y}-${m}-${day}`, v = parseFloat(val);
+    if (isNaN(v) || val === '') delete rainData[k]; else rainData[k] = v;
+    LS.set('rainData', rainData);
+    const inp = document.getElementById(`rain-inp-${y}-${m}-${day}`);
+    if (inp) inp.classList.toggle('has-rain', !isNaN(parseFloat(val)) && parseFloat(val) > 0);
+    updateRainTotals(); updateBarChart();
+    const el = document.getElementById(`mt-${y}-${m}`);
+    if (el) el.textContent = monthTotal(y,m).toFixed(1)+' mm';
+  };
+  function daysInMonth(y,m){ return new Date(y,m+1,0).getDate(); }
+  function firstDayOfMonth(y,m){ return new Date(y,m,1).getDay(); }
+  function monthTotal(y,m){ let t=0; for(let d=1;d<=daysInMonth(y,m);d++) t+=rainData[`${y}-${m}-${d}`]||0; return t; }
+  function updateRainTotals() {
+    let anual=0,diasc=0,max=0,mesAtual=0;
+    const curM=new Date().getMonth();
+    for(let m=0;m<12;m++) for(let d=1;d<=daysInMonth(rainYear,m);d++){
+      const v=rainData[`${rainYear}-${m}-${d}`]||0;
+      anual+=v; if(v>0)diasc++; if(v>max)max=v;
+      if(m===curM&&rainYear===new Date().getFullYear()) mesAtual+=v;
+    }
+    document.getElementById('rt-anual').textContent=anual.toFixed(1);
+    document.getElementById('rt-mes').textContent=mesAtual.toFixed(1);
+    document.getElementById('rt-diasc').textContent=diasc;
+    document.getElementById('rt-maximo').textContent=max.toFixed(1);
+  }
+  function updateBarChart() {
+    const chart=document.getElementById('rain-bar-chart');
+    const totals=Array.from({length:12},(_,m)=>monthTotal(rainYear,m));
+    const maxT=Math.max(...totals,1);
+    chart.innerHTML=totals.map((t,m)=>`
+      <div class="rain-bar-wrap" title="${MONTHS[m]}: ${t.toFixed(1)} mm">
+        <div class="rain-bar" style="height:${Math.round((t/maxT)*76)}px"></div>
+        <div class="rain-bar-lbl">${MONTHS[m].slice(0,3)}</div>
+      </div>`).join('');
+  }
+  function renderChuvas() {
+    document.getElementById('rain-year').textContent = rainYear;
+    updateRainTotals(); updateBarChart();
+    const grid=document.getElementById('months-grid');
+    grid.innerHTML=MONTHS.map((mName,m)=>{
+      const days=daysInMonth(rainYear,m), first=firstDayOfMonth(rainYear,m);
+      let cells=WDAYS.map(w=>`<div class="weekday-hdr">${w}</div>`).join('');
+      for(let b=0;b<first;b++) cells+=`<div></div>`;
+      for(let d=1;d<=days;d++){
+        const k=`${rainYear}-${m}-${d}`, v=rainData[k], hasRain=v!==undefined&&v>0;
+        cells+=`<div class="day-cell"><div class="day-label">${d}</div>
+          <input type="number" step="0.1" min="0" max="999"
+            id="rain-inp-${rainYear}-${m}-${d}" value="${v!==undefined?v:''}"
+            class="${hasRain?'has-rain':''}"
+            onchange="window.setRain(${rainYear},${m},${d},this.value)" /></div>`;
+      }
+      return `<div class="month-card">
+        <div class="month-title"><span>${mName} ${rainYear}</span>
+          <span class="month-total" id="mt-${rainYear}-${m}">${monthTotal(rainYear,m).toFixed(1)} mm</span></div>
+        <div class="days-grid">${cells}</div></div>`;
+    }).join('');
+  }
+  window.renderChuvas = renderChuvas;
+
+  // INIT
+  const today = new Date().toISOString().slice(0,10);
+  document.getElementById('lt-data').value = today;
+  document.getElementById('pv-data').value = today;
+  renderEstoque();
+  renderLotes();
+}
+
+// ══════════════════════════════════════════════════════════
+// MODO FIREBASE (tempo real)
+// ══════════════════════════════════════════════════════════
+function initFirebase(db) {
+  const { collection, doc, setDoc, deleteDoc, onSnapshot, serverTimestamp } = window.__fb || {};
+  // re-import since we already have db
+  import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js').then(fs => {
+    const col    = name => fs.collection(db, name);
+    const upsert = (c,id,data) => fs.setDoc(fs.doc(db,c,String(id)), {...data, _ts: fs.serverTimestamp()});
+    const remove = (c,id)     => fs.deleteDoc(fs.doc(db,c,String(id)));
+
+    let insumos=[], lotes=[], pulvs=[], rainData={}, rainYear=new Date().getFullYear();
+    const MONTHS=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+    const WDAYS=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+
+    window.showTab = function(id, btn) {
+      document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+      document.getElementById('tab-'+id).classList.add('active');
+      if(btn) btn.classList.add('active');
+      if(id==='chuvas') renderChuvas();
+      if(id==='lotes')  renderLotes();
+      if(id==='estoque') renderEstoque();
+      if(id==='pulv')   renderPulv();
+    };
+
+    fs.onSnapshot(col('insumos'), snap => { insumos=snap.docs.map(d=>({id:d.id,...d.data()})); renderEstoque(); });
+    fs.onSnapshot(col('lotes'),   snap => { lotes=snap.docs.map(d=>({...d.data()})).sort((a,b)=>(b.id||0)-(a.id||0)); renderLotes(); });
+    fs.onSnapshot(col('pulvs'),   snap => { pulvs=snap.docs.map(d=>({...d.data()})).sort((a,b)=>(b.id||0)-(a.id||0)); renderPulv(); });
+    fs.onSnapshot(col('chuvas'),  snap => { rainData={}; snap.docs.forEach(d=>{rainData[d.id]=d.data().mm;}); renderChuvas(); });
+
+    window.addInsumo  = async () => { const nome=document.getElementById('ins-nome').value.trim(); const qty=parseFloat(document.getElementById('ins-qty').value)||0; const unit=document.getElementById('ins-unit').value; if(!nome){alert('Informe o nome.');return;} const id=Date.now(); await upsert('insumos',id,{id,nome,qty,unit}); ['ins-nome','ins-qty'].forEach(k=>document.getElementById(k).value=''); };
+    window.removeInsumo = async id => { if(!confirm('Remover?'))return; await remove('insumos',id); };
+    window.updateQty = function(id) {
+      const ins=insumos.find(i=>String(i.id)===String(id)); if(!ins)return;
+      const card=document.getElementById('card-'+id);
+      card.querySelector('.ic-adj').style.display='none';
+      card.querySelector('.ic-qty').innerHTML=`<input id="qty-edit-${id}" type="number" step="0.01" value="${ins.qty}" style="width:70px;font-family:inherit;font-size:0.9rem;font-weight:700;color:var(--verde-campo);border:1px solid var(--verde-claro);border-radius:4px;padding:2px 6px;background:var(--fundo-card);" onkeydown="if(event.key==='Enter')window.saveQty('${id}');if(event.key==='Escape')window.renderEstoque();" onblur="window.saveQty('${id}')" />`;
+      document.getElementById('qty-edit-'+id).focus(); document.getElementById('qty-edit-'+id).select();
+    };
+    window.saveQty = async function(id) { const inp=document.getElementById('qty-edit-'+id); if(!inp)return; const v=parseFloat(inp.value); const ins=insumos.find(i=>String(i.id)===String(id)); if(!isNaN(v)&&ins) await upsert('insumos',id,{...ins,qty:Math.max(0,v)}); };
+    window.addLote = async () => {
+      const nome=document.getElementById('lt-nome').value.trim(); const data=document.getElementById('lt-data').value;
+      const corte=parseInt(document.getElementById('lt-corte').value)||1; const talhao=document.getElementById('lt-talhao').value.trim();
+      const nbolas=parseInt(document.getElementById('lt-nbolas').value)||0; const pesomed=parseFloat(document.getElementById('lt-pesomed').value)||0;
+      const obs=document.getElementById('lt-obs').value.trim();
+      if(!nome){alert('Informe o nome.');return;} if(nbolas<1){alert('Informe a quantidade de bolas.');return;}
+      const id=Date.now(); await upsert('lotes',id,{id,nome,data,corte,talhao,nbolas,pesomed,obs});
+      ['lt-nome','lt-data','lt-corte','lt-talhao','lt-nbolas','lt-pesomed','lt-obs'].forEach(k=>document.getElementById(k).value='');
+    };
+    window.removeLote = async id => { if(!confirm('Remover este lote?'))return; await remove('lotes',id); };
+    window.updateLoteField = async (id,field,val) => {
+      const lote=lotes.find(l=>String(l.id)===String(id)); if(!lote)return;
+      const u={...lote};
+      if(field==='nbolas')u.nbolas=parseInt(val)||0; else if(field==='pesomed')u.pesomed=parseFloat(val)||0;
+      else if(field==='corte')u.corte=parseInt(val)||1; else u[field]=val;
+      await upsert('lotes',id,u);
+    };
+    window.startEdit = function(td,id,field,type) {
+      if(td.querySelector('input'))return;
+      const lote=lotes.find(l=>String(l.id)===String(id)); const cur=lote?lote[field]:'';
+      const display=td.querySelector('.lt-display'); const inp=document.createElement('input');
+      inp.type=type||'text'; if(type==='number'){inp.step=field==='pesomed'?'0.1':'1';inp.min='0';}
+      inp.value=cur||''; inp.style.cssText='font-family:inherit;font-size:0.87rem;border:1px solid var(--verde-claro);border-radius:4px;padding:3px 6px;width:100%;background:#fff;color:var(--texto);outline:none';
+      if(display)display.style.display='none'; td.appendChild(inp); inp.focus(); if(inp.select)inp.select();
+      const done=()=>window.updateLoteField(id,field,inp.value);
+      inp.addEventListener('blur',done);
+      inp.addEventListener('keydown',e=>{if(e.key==='Enter')inp.blur();if(e.key==='Escape'){inp.removeEventListener('blur',done);renderLotes();}});
+    };
+    window.addPulv = async () => {
+      const data=document.getElementById('pv-data').value; const produto=document.getElementById('pv-produto').value.trim();
+      const dose=document.getElementById('pv-dose').value.trim(); const vazao=document.getElementById('pv-vazao').value.trim();
+      if(!data||!produto){alert('Informe a data e o produto.');return;}
+      const id=Date.now(); await upsert('pulvs',id,{id,data,produto,dose,vazao});
+      ['pv-produto','pv-dose','pv-vazao'].forEach(k=>document.getElementById(k).value='');
+    };
+    window.removePulv = async id => { if(!confirm('Remover?'))return; await remove('pulvs',id); };
+    window.changeYear = d => { rainYear+=d; renderChuvas(); };
+    window.setRain = async (y,m,day,val) => {
+      const k=`${y}-${m}-${day}`, v=parseFloat(val);
+      if(isNaN(v)||val===''){await remove('chuvas',k);delete rainData[k];}
+      else{rainData[k]=v;await upsert('chuvas',k,{mm:v});}
+      const inp=document.getElementById(`rain-inp-${y}-${m}-${day}`);
+      if(inp)inp.classList.toggle('has-rain',!isNaN(parseFloat(val))&&parseFloat(val)>0);
+      updateRainTotals();updateBarChart();
+      const el=document.getElementById(`mt-${y}-${m}`);if(el)el.textContent=monthTotal(y,m).toFixed(1)+' mm';
+    };
+
+    function daysInMonth(y,m){return new Date(y,m+1,0).getDate();}
+    function firstDayOfMonth(y,m){return new Date(y,m,1).getDay();}
+    function monthTotal(y,m){let t=0;for(let d=1;d<=daysInMonth(y,m);d++)t+=rainData[`${y}-${m}-${d}`]||0;return t;}
+    function updateRainTotals(){let anual=0,diasc=0,max=0,mesAtual=0;const curM=new Date().getMonth();for(let m=0;m<12;m++)for(let d=1;d<=daysInMonth(rainYear,m);d++){const v=rainData[`${rainYear}-${m}-${d}`]||0;anual+=v;if(v>0)diasc++;if(v>max)max=v;if(m===curM&&rainYear===new Date().getFullYear())mesAtual+=v;}document.getElementById('rt-anual').textContent=anual.toFixed(1);document.getElementById('rt-mes').textContent=mesAtual.toFixed(1);document.getElementById('rt-diasc').textContent=diasc;document.getElementById('rt-maximo').textContent=max.toFixed(1);}
+    function updateBarChart(){const chart=document.getElementById('rain-bar-chart');const totals=Array.from({length:12},(_,m)=>monthTotal(rainYear,m));const maxT=Math.max(...totals,1);chart.innerHTML=totals.map((t,m)=>`<div class="rain-bar-wrap"><div class="rain-bar" style="height:${Math.round((t/maxT)*76)}px"></div><div class="rain-bar-lbl">${MONTHS[m].slice(0,3)}</div></div>`).join('');}
+
+    function renderEstoque(){document.getElementById('st-total').textContent=insumos.length;const wrap=document.getElementById('estoque-cards-wrap');if(insumos.length===0){wrap.innerHTML='<div class="empty-state">Nenhum produto cadastrado.</div>';return;}wrap.innerHTML=`<div class="insumos-grid">${insumos.map(i=>`<div class="insumo-card" id="card-${i.id}"><div class="ic-nome">${i.nome}</div><span class="ic-qty">${(+i.qty).toLocaleString('pt-BR',{maximumFractionDigits:2})}</span><span class="ic-unit">${i.unit}</span><button class="ic-adj" onclick="window.updateQty('${i.id}')">± ajustar</button><button class="ic-del" onclick="window.removeInsumo('${i.id}')" title="Remover">✕</button></div>`).join('')}</div>`;}
+    window.renderEstoque=renderEstoque;
+
+    function updateLoteTotals(){let totalBolas=0,somaMedia=0,countMedia=0;lotes.forEach(l=>{totalBolas+=l.nbolas||0;if(l.pesomed){somaMedia+=+l.pesomed;countMedia++;}});document.getElementById('lt-lotes').textContent=lotes.length;document.getElementById('lt-bolas').textContent=totalBolas;document.getElementById('lt-media').textContent=countMedia?(somaMedia/countMedia).toFixed(1):'—';}
+    function renderLotes(){updateLoteTotals();const wrap=document.getElementById('lotes-list');if(lotes.length===0){wrap.innerHTML='<div class="empty-state">Nenhum lote cadastrado ainda.</div>';return;}const fmtDate=v=>v?new Date(v+'T00:00').toLocaleDateString('pt-BR'):'—';wrap.innerHTML=`<div style="border:1px solid var(--borda);border-radius:8px;overflow:hidden"><table class="lotes-table"><thead><tr><th>Lote</th><th>Data</th><th>Corte</th><th>Talhão</th><th style="text-align:right">Bolas</th><th style="text-align:right">Peso Médio (kg)</th><th></th></tr></thead><tbody>${lotes.map(l=>`<tr style="vertical-align:top"><td class="lt-cell" ondblclick="window.startEdit(this,'${l.id}','nome','text')"><span class="lt-display" style="font-weight:600">${l.nome||'—'}</span>${l.obs?`<div style="font-size:0.74rem;color:var(--texto-muted);margin-top:19px" ondblclick="event.stopPropagation();window.startEdit(this.closest('td'),'${l.id}','obs','text')"><strong>Obs:</strong> ${l.obs}</div>`:`<div style="font-size:0.74rem;color:var(--borda);margin-top:19px" ondblclick="event.stopPropagation();window.startEdit(this.closest('td'),'${l.id}','obs','text')">+ obs</div>`}</td><td class="lt-cell" style="vertical-align:top" ondblclick="window.startEdit(this,'${l.id}','data','date')"><span class="lt-display">${fmtDate(l.data)}</span></td><td class="lt-cell" style="text-align:center;vertical-align:top" ondblclick="window.startEdit(this,'${l.id}','corte','number')"><span class="lt-display">${l.corte||1}º</span></td><td class="lt-cell" style="vertical-align:top" ondblclick="window.startEdit(this,'${l.id}','talhao','text')"><span class="lt-display">${l.talhao||'—'}</span></td><td class="lt-cell" style="text-align:right;vertical-align:top" ondblclick="window.startEdit(this,'${l.id}','nbolas','number')"><span class="lt-display" style="font-family:'JetBrains Mono',monospace">${l.nbolas||'—'}</span></td><td class="lt-cell" style="text-align:right;vertical-align:top" ondblclick="window.startEdit(this,'${l.id}','pesomed','number')"><span class="lt-display" style="font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--verde-campo)">${l.pesomed||'—'}</span></td><td><button class="btn btn-danger" onclick="window.removeLote('${l.id}')">✕</button></td></tr>`).join('')}</tbody></table><div style="padding:8px 14px;font-size:0.72rem;color:var(--texto-muted);border-top:1px solid var(--borda);background:var(--fundo)">Duplo toque em qualquer campo para editar</div></div>`;}
+    window.renderLotes=renderLotes;
+
+    function renderPulv(){const wrap=document.getElementById('pulv-list');if(!wrap)return;if(pulvs.length===0){wrap.innerHTML='<div class="empty-state">Nenhuma aplicação registrada ainda.</div>';return;}wrap.innerHTML=`<div style="border:1px solid var(--borda);border-radius:8px;overflow:hidden"><table style="width:100%;border-collapse:collapse;font-size:0.87rem"><thead><tr style="background:var(--verde-campo);color:var(--palha)"><th style="padding:10px 14px;font-size:0.72rem;letter-spacing:0.05em;text-transform:uppercase">Data</th><th style="padding:10px 14px;font-size:0.72rem;letter-spacing:0.05em;text-transform:uppercase">Produto(s)</th><th style="padding:10px 14px;font-size:0.72rem;letter-spacing:0.05em;text-transform:uppercase">Dose</th><th style="padding:10px 14px;font-size:0.72rem;letter-spacing:0.05em;text-transform:uppercase">Vazão</th><th></th></tr></thead><tbody>${pulvs.map((p,i)=>`<tr style="${i%2===1?'background:rgba(168,201,127,0.07)':''}"><td style="padding:9px 10px;white-space:nowrap;color:var(--texto-muted);font-size:0.78rem;width:80px">${p.data?new Date(p.data+'T00:00').toLocaleDateString('pt-BR'):'—'}</td><td style="padding:9px 14px;font-weight:500">${p.produto}</td><td style="padding:9px 14px;font-family:'JetBrains Mono',monospace;font-size:0.85rem">${p.dose||'—'}</td><td style="padding:9px 14px;font-family:'JetBrains Mono',monospace;font-size:0.85rem">${p.vazao||'—'}</td><td style="padding:9px 14px"><button class="btn btn-danger" onclick="window.removePulv('${p.id}')">✕</button></td></tr>`).join('')}</tbody></table></div>`;}
+    window.renderPulv=renderPulv;
+
+    function renderChuvas(){document.getElementById('rain-year').textContent=rainYear;updateRainTotals();updateBarChart();const grid=document.getElementById('months-grid');grid.innerHTML=MONTHS.map((mName,m)=>{const days=daysInMonth(rainYear,m),first=firstDayOfMonth(rainYear,m);let cells=WDAYS.map(w=>`<div class="weekday-hdr">${w}</div>`).join('');for(let b=0;b<first;b++)cells+=`<div></div>`;for(let d=1;d<=days;d++){const k=`${rainYear}-${m}-${d}`,v=rainData[k],hasRain=v!==undefined&&v>0;cells+=`<div class="day-cell"><div class="day-label">${d}</div><input type="number" step="0.1" min="0" max="999" id="rain-inp-${rainYear}-${m}-${d}" value="${v!==undefined?v:''}" class="${hasRain?'has-rain':''}" onchange="window.setRain(${rainYear},${m},${d},this.value)" /></div>`;}return`<div class="month-card"><div class="month-title"><span>${mName} ${rainYear}</span><span class="month-total" id="mt-${rainYear}-${m}">${monthTotal(rainYear,m).toFixed(1)} mm</span></div><div class="days-grid">${cells}</div></div>`;}).join('');}
+    window.renderChuvas=renderChuvas;
+
+    const today=new Date().toISOString().slice(0,10);
+    document.getElementById('lt-data').value=today;
+    document.getElementById('pv-data').value=today;
+  });
+}
+</script>
+</body>
+</html>
