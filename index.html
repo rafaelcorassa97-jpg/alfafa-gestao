@@ -12,7 +12,7 @@
     --fundo-card:#FDFAF4;--texto:#1C1A16;--texto-muted:#6B6455;--borda:#D4C89A;
   }
   *{box-sizing:border-box;margin:0;padding:0;}
-  body{font-family:'Inter',sans-serif;background:var(--fundo);color:var(--texto);min-height:100vh;}
+  body{font-family:'Inter',sans-serif;background:var(--fundo);color:var(--texto);min-height:100vh;font-size:14px;}
   header{background:var(--verde-campo);padding:18px 32px;display:flex;align-items:center;gap:16px;box-shadow:0 2px 12px rgba(0,0,0,0.18);}
   .logo-icon{font-size:28px;}
   header h1{font-family:'DM Serif Display',serif;color:var(--palha);font-size:1.5rem;}
@@ -25,7 +25,7 @@
   .tab-btn:hover:not(.active){color:#d4c89a;}
   main{max-width:1100px;margin:0 auto;padding:32px 24px;}
   .tab-panel{display:none;}.tab-panel.active{display:block;}
-  .section-title{font-family:'DM Serif Display',serif;font-size:1.5rem;color:var(--verde-campo);margin-bottom:6px;}
+  .section-title{font-family:'DM Serif Display',serif;font-size:1.2rem;color:var(--verde-campo);margin-bottom:6px;}
   .section-sub{color:var(--texto-muted);font-size:0.82rem;margin-bottom:24px;}
   .card{background:var(--fundo-card);border:1px solid var(--borda);border-radius:10px;padding:24px;margin-bottom:20px;}
   .card h3{font-size:0.9rem;font-weight:600;color:var(--verde-claro);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:16px;border-bottom:1px solid var(--borda);padding-bottom:8px;}
@@ -44,7 +44,7 @@
   .btn-outline:hover{background:var(--verde-claro);color:#fff;}
   .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:20px;}
   .stat-card{background:var(--verde-campo);border-radius:10px;padding:18px 20px;color:var(--palha);}
-  .stat-card .val{font-family:'DM Serif Display',serif;font-size:2rem;line-height:1;color:#fff;}
+  .stat-card .val{font-family:'DM Serif Display',serif;font-size:1.6rem;line-height:1;color:#fff;}
   .stat-card .lbl{font-size:0.72rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--verde-suave);margin-top:4px;}
   .mono{font-family:'JetBrains Mono',monospace;font-size:0.85rem;}
   /* ESTOQUE */
@@ -61,10 +61,10 @@
   .insumo-card .ic-adj{font-size:0.72rem;color:var(--verde-claro);background:none;border:none;cursor:pointer;padding:0;font-family:inherit;text-decoration:underline;text-underline-offset:2px;white-space:nowrap;opacity:0;transition:opacity 0.15s;}
   .insumo-card:hover .ic-adj{opacity:1;}
   /* LOTES */
-  .lotes-table{width:100%;border-collapse:collapse;font-size:0.87rem;}
+  .lotes-table{width:100%;border-collapse:collapse;font-size:0.78rem;}
   .lotes-table thead tr{background:var(--verde-campo);color:var(--palha);}
-  .lotes-table th{padding:10px 12px;text-align:left;font-size:0.72rem;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;white-space:nowrap;}
-  .lotes-table td{padding:9px 12px;border-bottom:1px solid var(--borda);vertical-align:top;}
+  .lotes-table th{padding:8px 10px;text-align:left;font-size:0.68rem;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;white-space:nowrap;}
+  .lotes-table td{padding:7px 10px;border-bottom:1px solid var(--borda);vertical-align:top;}
   .lotes-table tr:nth-child(even) td{background:rgba(168,201,127,0.07);}
   .lotes-table tr:hover td{background:rgba(168,201,127,0.15);}
   .lotes-table td:first-child{white-space:normal;min-width:140px;}
@@ -451,34 +451,68 @@ function initLocal() {
     if (lotes.length === 0) { wrap.innerHTML = '<div class="empty-state">Nenhum lote cadastrado ainda.</div>'; return; }
     const fmtDate = v => v ? new Date(v+'T00:00').toLocaleDateString('pt-BR') : '—';
     wrap.innerHTML = `
-      <div style="border:1px solid var(--borda);border-radius:8px;overflow:hidden">
-        <table class="lotes-table">
-          <thead><tr>
-            <th>Lote</th><th>Data</th><th>Corte</th><th>Talhão</th>
-            <th style="text-align:right">Bolas</th>
-            <th style="text-align:right">Peso Médio (kg)</th>
-            <th></th>
-          </tr></thead>
-          <tbody>
-            ${lotes.map(l => `
-            <tr style="vertical-align:top">
-              <td class="lt-cell" ondblclick="window.startEdit(this,'${l.id}','nome','text')">
-                <span class="lt-display" style="font-weight:600">${l.nome||'—'}</span>
-                ${l.obs
-                  ? `<div style="font-size:0.74rem;color:var(--texto-muted);margin-top:19px" ondblclick="event.stopPropagation();window.startEdit(this.closest('td'),'${l.id}','obs','text')"><strong>Obs:</strong> ${l.obs}</div>`
-                  : `<div style="font-size:0.74rem;color:var(--borda);margin-top:19px" ondblclick="event.stopPropagation();window.startEdit(this.closest('td'),'${l.id}','obs','text')">+ obs</div>`}
-              </td>
-              <td class="lt-cell" style="vertical-align:top" ondblclick="window.startEdit(this,'${l.id}','data','date')"><span class="lt-display">${fmtDate(l.data)}</span></td>
-              <td class="lt-cell" style="text-align:center;vertical-align:top" ondblclick="window.startEdit(this,'${l.id}','corte','number')"><span class="lt-display">${l.corte||1}º</span></td>
-              <td class="lt-cell" style="vertical-align:top" ondblclick="window.startEdit(this,'${l.id}','talhao','text')"><span class="lt-display">${l.talhao||'—'}</span></td>
-              <td class="lt-cell" style="text-align:right;vertical-align:top" ondblclick="window.startEdit(this,'${l.id}','nbolas','number')"><span class="lt-display" style="font-family:'JetBrains Mono',monospace">${l.nbolas||'—'}</span></td>
-              <td class="lt-cell" style="text-align:right;vertical-align:top" ondblclick="window.startEdit(this,'${l.id}','pesomed','number')"><span class="lt-display" style="font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--verde-campo)">${l.pesomed||'—'}</span></td>
-              <td><button class="btn btn-danger" onclick="window.removeLote('${l.id}')">✕</button></td>
-            </tr>`).join('')}
-          </tbody>
-        </table>
-        <div style="padding:8px 14px;font-size:0.72rem;color:var(--texto-muted);border-top:1px solid var(--borda);background:var(--fundo)">
-          Duplo toque em qualquer campo para editar
+      <div class="lotes-mobile">
+        ${lotes.map(l => `
+        <div class="lote-card">
+          <div class="lote-card-header">
+            <div class="lote-card-nome lt-cell" ondblclick="window.startEdit(this,'${l.id}','nome','text')">${l.nome||'—'}</div>
+            <button class="btn btn-danger" onclick="window.removeLote('${l.id}')">✕</button>
+          </div>
+          <div class="lote-card-grid">
+            <div class="lote-card-item lt-cell" ondblclick="window.startEdit(this,'${l.id}','data','date')">
+              <label>Data</label><span class="lt-display">${fmtDate(l.data)}</span>
+            </div>
+            <div class="lote-card-item lt-cell" ondblclick="window.startEdit(this,'${l.id}','corte','number')">
+              <label>Corte</label><span class="lt-display">${l.corte||1}º</span>
+            </div>
+            <div class="lote-card-item lt-cell" ondblclick="window.startEdit(this,'${l.id}','talhao','text')">
+              <label>Talhão</label><span class="lt-display">${l.talhao||'—'}</span>
+            </div>
+            <div class="lote-card-item lt-cell" ondblclick="window.startEdit(this,'${l.id}','nbolas','number')">
+              <label>Bolas</label><span class="lt-display">${l.nbolas||'—'}</span>
+            </div>
+            <div class="lote-card-item lt-cell" ondblclick="window.startEdit(this,'${l.id}','pesomed','number')">
+              <label>Peso Médio (kg)</label><span class="lt-display" style="color:var(--verde-campo);font-weight:700">${l.pesomed||'—'}</span>
+            </div>
+          </div>
+          ${l.obs
+            ? `<div class="lote-card-obs lt-cell" ondblclick="window.startEdit(this,'${l.id}','obs','text')"><strong>Obs:</strong> ${l.obs}</div>`
+            : `<div class="lote-card-obs lt-cell" style="color:var(--borda)" ondblclick="window.startEdit(this,'${l.id}','obs','text')">+ obs</div>`}
+        </div>`).join('')}
+        <div style="font-size:0.72rem;color:var(--texto-muted);text-align:center;padding:4px">Duplo toque em qualquer campo para editar</div>
+      </div>
+      <div class="lotes-desktop">
+        <div style="border:1px solid var(--borda);border-radius:8px;overflow:hidden">
+          <div style="overflow-x:auto">
+            <table class="lotes-table" style="min-width:580px">
+              <thead><tr>
+                <th>Lote</th><th>Data</th><th>Corte</th><th>Talhão</th>
+                <th style="text-align:right">Bolas</th>
+                <th style="text-align:right">Peso Médio (kg)</th>
+                <th></th>
+              </tr></thead>
+              <tbody>
+                ${lotes.map(l => `
+                <tr style="vertical-align:top">
+                  <td class="lt-cell" ondblclick="window.startEdit(this,'${l.id}','nome','text')">
+                    <span class="lt-display" style="font-weight:600">${l.nome||'—'}</span>
+                    ${l.obs
+                      ? `<div style="font-size:0.74rem;color:var(--texto-muted);margin-top:19px" ondblclick="event.stopPropagation();window.startEdit(this.closest('td'),'${l.id}','obs','text')"><strong>Obs:</strong> ${l.obs}</div>`
+                      : `<div style="font-size:0.74rem;color:var(--borda);margin-top:19px" ondblclick="event.stopPropagation();window.startEdit(this.closest('td'),'${l.id}','obs','text')">+ obs</div>`}
+                  </td>
+                  <td class="lt-cell" style="vertical-align:top" ondblclick="window.startEdit(this,'${l.id}','data','date')"><span class="lt-display">${fmtDate(l.data)}</span></td>
+                  <td class="lt-cell" style="text-align:center;vertical-align:top" ondblclick="window.startEdit(this,'${l.id}','corte','number')"><span class="lt-display">${l.corte||1}º</span></td>
+                  <td class="lt-cell" style="vertical-align:top" ondblclick="window.startEdit(this,'${l.id}','talhao','text')"><span class="lt-display">${l.talhao||'—'}</span></td>
+                  <td class="lt-cell" style="text-align:right;vertical-align:top" ondblclick="window.startEdit(this,'${l.id}','nbolas','number')"><span class="lt-display" style="font-family:'JetBrains Mono',monospace">${l.nbolas||'—'}</span></td>
+                  <td class="lt-cell" style="text-align:right;vertical-align:top" ondblclick="window.startEdit(this,'${l.id}','pesomed','number')"><span class="lt-display" style="font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--verde-campo)">${l.pesomed||'—'}</span></td>
+                  <td><button class="btn btn-danger" onclick="window.removeLote('${l.id}')">✕</button></td>
+                </tr>`).join('')}
+              </tbody>
+            </table>
+          </div>
+          <div style="padding:8px 14px;font-size:0.72rem;color:var(--texto-muted);border-top:1px solid var(--borda);background:var(--fundo)">
+            Duplo toque em qualquer campo para editar
+          </div>
         </div>
       </div>`;
   }
