@@ -197,9 +197,9 @@ input:focus,select:focus{outline:none;border-color:var(--vl);}
   <div class="card">
     <h3>Nova Aplicação</h3>
     <div class="row" style="margin-bottom:10px">
-      <div class="fg" style="max-width:150px;flex:0 0 150px"><label>Data</label><input type="date" id="p-dt"/></div>
-      <div class="fg" style="max-width:120px"><label>Vazão (L/ha)</label><input type="number" id="p-vz" placeholder="Ex: 150" step="0.1" min="0" oninput="W.recalc()"/></div>
-      <div class="fg" style="max-width:120px"><label>Área (ha)</label><input type="number" id="p-ar" placeholder="Ex: 10" step="0.1" min="0" oninput="W.recalc()"/></div>
+      <div class="fg" style="flex:1;min-width:130px;max-width:160px"><label>Data</label><input type="date" id="p-dt"/></div>
+      <div class="fg" style="flex:1;min-width:110px;max-width:140px"><label>Vazão (L/ha)</label><input type="number" id="p-vz" placeholder="Ex: 150" step="0.1" min="0" onblur="W.recalc()" onchange="W.recalc()"/></div>
+      <div class="fg" style="flex:1;min-width:110px;max-width:140px"><label>Área (ha)</label><input type="number" id="p-ar" placeholder="Ex: 10" step="0.1" min="0" onblur="W.recalc()" onchange="W.recalc()"/></div>
     </div>
     <div id="p-prods-form"></div>
     <div class="row" style="margin-bottom:10px">
@@ -455,8 +455,7 @@ function rProdForm(){
       <div class="fg" style="flex:2;min-width:140px">
         <label>Produto</label>
         <input type="text" id="pd-nm-${i}" value="${p.nm}" placeholder="Ex: Glifosato"
-          onblur="prodLines[${i}].nm=this.value"
-          onchange="prodLines[${i}].nm=this.value"/>
+          onblur="prodLines[${i}].nm=this.value"/>
       </div>
       <div class="fg" style="min-width:100px">
         <label>Dose (L/ha ou kg/ha)</label>
