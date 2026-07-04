@@ -3,7 +3,13 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Gestão Alfafa</title>
+<title>Operacional Alfafa</title>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="Operacional Alfafa"/>
+<meta name="application-name" content="Operacional Alfafa"/>
+<meta name="theme-color" content="#2D5016"/>
+<link rel="apple-touch-icon" href="https://fav.farm/🌿"/>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap');
 :root{--vc:#2D5016;--vl:#4A7C2F;--vs:#A8C97F;--pa:#E8D5A0;--pe:#C9B070;--fn:#F5F0E8;--fc:#FDFAF4;--tx:#1C1A16;--tm:#6B6455;--bd:#D4C89A;}
@@ -80,11 +86,11 @@ input:focus,select:focus{outline:none;border-color:var(--vl);}
 .pc-prod{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid var(--bd);}
 .pc-prod:last-child{border-bottom:none;}
 .pc-prod .pnm{font-weight:500;font-size:0.88rem;}
-.pc-prod .pdose{font-family:'JetBrains Mono',monospace;font-size:0.8rem;color:var(--tm);text-align:right;}
+.pc-prod .pdose{font-family:'JetBrains Mono',monospace;font-size:0.8rem;color:var(--tm);text-align:left;}
 .pc-prod .pvol{font-family:'JetBrains Mono',monospace;font-size:0.82rem;color:var(--vc);font-weight:700;text-align:right;white-space:nowrap;}
 .pc-prod-hdr{display:grid;grid-template-columns:1fr auto auto;gap:8px;padding:4px 0 6px;border-bottom:2px solid var(--bd);margin-bottom:2px;}
 .pc-prod-hdr span{font-size:0.68rem;font-weight:600;color:var(--tm);text-transform:uppercase;letter-spacing:0.05em;}
-.pc-prod-hdr span:nth-child(2),.pc-prod-hdr span:nth-child(3){text-align:right;}
+.pc-prod-hdr span:nth-child(2){text-align:left;}.pc-prod-hdr span:nth-child(3){text-align:right;}
 .prod-form{display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;background:var(--fn);border-radius:8px;padding:12px;margin-bottom:10px;}
 .vol-calc{font-size:0.78rem;color:var(--vc);font-weight:600;margin-top:2px;}
 
@@ -127,7 +133,7 @@ input:focus,select:focus{outline:none;border-color:var(--vl);}
 <body>
 <header>
   <span style="font-size:26px">🌿</span>
-  <h1>Gestão Alfafa</h1>
+  <h1>Operacional Alfafa</h1>
   <span class="sync" id="ss">⏳ Conectando...</span>
 </header>
 <nav>
@@ -427,31 +433,81 @@ function calcVol(dose, area) {
   return (d * a).toFixed(1);
 }
 
+function getAr(){return parseFloat(document.getElementById('p-ar').value)||0;}
+
+function updateVolDisplay(i){
+  const ar = getAr();
+  const doseEl = document.getElementById('pd-dose-'+i);
+  const volEl  = document.getElementById('pd-vol-'+i);
+  if(!doseEl||!volEl)return;
+  const dose = parseFloat(doseEl.value)||0;
+  const vol  = calcVol(dose, ar);
+  volEl.textContent = vol !== null ? vol+' L' : ar>0 ? '—' : 'informe área';
+}
+
 function rProdForm(){
-  const vz = parseFloat(document.getElementById('p-vz').value) || 0;
-  const ar = parseFloat(document.getElementById('p-ar').value) || 0;
+  const ar = getAr();
   const w = document.getElementById('p-prods-form');
   w.innerHTML = prodLines.map((p,i) => {
     const vol = calcVol(p.dose, ar);
     return `
-    <div class="prod-form">
-      <div class="fg" style="flex:2;min-width:140px"><label>Produto</label><input type="text" value="${p.nm}" placeholder="Ex: Glifosato" oninput="W.updProd(${i},'nm',this.value)"/></div>
-      <div class="fg" style="min-width:100px"><label>Dose (L/ha ou kg/ha)</label><input type="number" step="0.01" value="${p.dose}" placeholder="Ex: 2" oninput="W.updProd(${i},'dose',this.value)"/></div>
+    <div class="prod-form" id="pf-${i}">
+      <div class="fg" style="flex:2;min-width:140px">
+        <label>Produto</label>
+        <input type="text" id="pd-nm-${i}" value="${p.nm}" placeholder="Ex: Glifosato"
+          onblur="prodLines[${i}].nm=this.value"
+          onchange="prodLines[${i}].nm=this.value"/>
+      </div>
+      <div class="fg" style="min-width:100px">
+        <label>Dose (L/ha ou kg/ha)</label>
+        <input type="number" step="0.01" id="pd-dose-${i}" value="${p.dose}" placeholder="Ex: 2"
+          onblur="prodLines[${i}].dose=this.value;updateVolDisplay(${i})"
+          onchange="prodLines[${i}].dose=this.value;updateVolDisplay(${i})"/>
+      </div>
       <div class="fg" style="min-width:100px">
         <label>Vol. no Tanque (L)</label>
-        <div style="font-family:'JetBrains Mono',monospace;font-size:1rem;font-weight:700;color:var(--vc);padding:7px 0">
-          ${vol !== null ? vol + ' L' : ar > 0 ? '—' : 'informe área'}
+        <div id="pd-vol-${i}" style="font-family:'JetBrains Mono',monospace;font-size:1rem;font-weight:700;color:var(--vc);padding:7px 0">
+          ${vol !== null ? vol+' L' : ar>0 ? '—' : 'informe área'}
         </div>
       </div>
       ${i>0?`<button class="btn bd2" style="align-self:flex-end" onclick="W.remProd(${i})">✕</button>`:''}
     </div>`;
   }).join('');
 }
-W.recalc=()=>{rProdForm();};
-W.updProd=(i,f,v)=>{prodLines[i][f]=v;rProdForm();};
-W.addProd=()=>{prodLines.push({nm:'',dose:''});rProdForm();};
-W.remProd=(i)=>{prodLines.splice(i,1);rProdForm();};
+W.recalc=()=>{
+  const ar=getAr();
+  prodLines.forEach((_,i)=>updateVolDisplay(i));
+};
+W.updProd=(i,f,v)=>{prodLines[i][f]=v;};
+W.addProd=()=>{
+  // save current values before re-render
+  prodLines.forEach((_,i)=>{
+    const nm=document.getElementById('pd-nm-'+i);
+    const dose=document.getElementById('pd-dose-'+i);
+    if(nm)prodLines[i].nm=nm.value;
+    if(dose)prodLines[i].dose=dose.value;
+  });
+  prodLines.push({nm:'',dose:''});
+  rProdForm();
+};
+W.remProd=(i)=>{
+  prodLines.forEach((_,j)=>{
+    const nm=document.getElementById('pd-nm-'+j);
+    const dose=document.getElementById('pd-dose-'+j);
+    if(nm)prodLines[j].nm=nm.value;
+    if(dose)prodLines[j].dose=dose.value;
+  });
+  prodLines.splice(i,1);
+  rProdForm();
+};
 W.addP=async()=>{
+  // read current DOM values
+  prodLines.forEach((_,i)=>{
+    const nm=document.getElementById('pd-nm-'+i);
+    const dose=document.getElementById('pd-dose-'+i);
+    if(nm)prodLines[i].nm=nm.value;
+    if(dose)prodLines[i].dose=dose.value;
+  });
   const dt  = document.getElementById('p-dt').value;
   const vz  = parseFloat(document.getElementById('p-vz').value) || 0;
   const ar  = parseFloat(document.getElementById('p-ar').value) || 0;
@@ -484,7 +540,7 @@ function rP(){
       </div>
       <div class="pc-prods">
         <div class="pc-prod-hdr">
-          <span>Produto</span><span>Dose</span><span>Vol. Tanque</span>
+          <span>Produto</span><span style='text-align:left'>Dose</span><span>Vol. Tanque</span>
         </div>
         ${(p.prods||[]).map(pr=>`
         <div class="pc-prod">
