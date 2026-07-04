@@ -12,12 +12,12 @@ body{font-family:'Inter',sans-serif;background:var(--fn);color:var(--tx);min-hei
 header{background:var(--vc);padding:14px 20px;display:flex;align-items:center;gap:12px;box-shadow:0 2px 8px rgba(0,0,0,0.2);}
 header h1{font-family:'DM Serif Display',serif;color:var(--pa);font-size:1.3rem;}
 .sync{margin-left:auto;font-size:0.7rem;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;padding:4px 10px;border-radius:20px;background:rgba(255,255,255,0.1);color:var(--vs);}
-.sync.ok{color:#a8e6a0;} .sync.err{color:#f8b4b4;}
+.sync.ok{color:#a8e6a0;}.sync.err{color:#f8b4b4;}
 nav{background:var(--vc);border-top:1px solid rgba(255,255,255,0.08);display:flex;overflow-x:auto;}
 .nb{background:none;border:none;color:var(--vs);font-family:'Inter',sans-serif;font-size:0.82rem;font-weight:500;padding:12px 16px;cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap;}
 .nb.on{color:var(--pa);border-bottom-color:var(--pe);}
 main{max-width:1000px;margin:0 auto;padding:20px 16px;}
-.pg{display:none;} .pg.on{display:block;}
+.pg{display:none;}.pg.on{display:block;}
 .ttl{font-family:'DM Serif Display',serif;font-size:1.4rem;color:var(--vc);margin-bottom:4px;}
 .sub{color:var(--tm);font-size:0.8rem;margin-bottom:20px;}
 .card{background:var(--fc);border:1px solid var(--bd);border-radius:10px;padding:20px;margin-bottom:16px;}
@@ -28,14 +28,16 @@ main{max-width:1000px;margin:0 auto;padding:20px 16px;}
 input,select{font-family:'Inter',sans-serif;font-size:0.88rem;background:var(--fn);border:1px solid var(--bd);border-radius:6px;padding:7px 11px;color:var(--tx);width:100%;}
 input:focus,select:focus{outline:none;border-color:var(--vl);}
 .btn{font-family:'Inter',sans-serif;font-size:0.83rem;font-weight:600;border:none;border-radius:6px;padding:8px 18px;cursor:pointer;}
-.bp{background:var(--vl);color:#fff;} .bp:hover{background:var(--vc);}
+.bp{background:var(--vl);color:#fff;}.bp:hover{background:var(--vc);}
 .bd2{background:#c0392b;color:#fff;padding:4px 9px;font-size:0.75rem;}
-.bo{background:transparent;border:1px solid var(--vl);color:var(--vl);} .bo:hover{background:var(--vl);color:#fff;}
+.bo{background:transparent;border:1px solid var(--vl);color:var(--vl);}.bo:hover{background:var(--vl);color:#fff;}
+.bs{background:rgba(255,255,255,0.15);color:var(--pa);border:1px solid rgba(255,255,255,0.3);padding:3px 10px;font-size:0.75rem;}
 .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:18px;}
 .sc{background:var(--vc);border-radius:10px;padding:16px 18px;}
 .sc .v{font-family:'DM Serif Display',serif;font-size:1.8rem;color:#fff;line-height:1;}
 .sc .l{font-size:0.68rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--vs);margin-top:3px;}
 .empty{text-align:center;color:var(--tm);padding:28px;font-size:0.88rem;font-style:italic;}
+
 /* ESTOQUE */
 .ilist{display:flex;flex-direction:column;border:1px solid var(--bd);border-radius:8px;overflow:hidden;}
 .irow{background:var(--fc);border-bottom:1px solid var(--bd);padding:9px 14px;display:flex;align-items:center;gap:10px;}
@@ -47,33 +49,39 @@ input:focus,select:focus{outline:none;border-color:var(--vl);}
 .irow .adj{font-size:0.7rem;color:var(--vl);background:none;border:none;cursor:pointer;text-decoration:underline;opacity:0;transition:opacity 0.15s;font-family:inherit;}
 .irow:hover .adj{opacity:1;}
 .irow .del{background:none;border:none;color:var(--tm);cursor:pointer;font-size:0.72rem;opacity:0;transition:opacity 0.15s;padding:2px 4px;}
-.irow:hover .del{opacity:1;} .irow .del:hover{color:#c0392b;}
+.irow:hover .del{opacity:1;}.irow .del:hover{color:#c0392b;}
+
+/* LOTES MOBILE */
+.lc{background:var(--fc);border:1px solid var(--bd);border-radius:10px;overflow:hidden;margin-bottom:10px;}
+.lc-hd{background:var(--vc);padding:10px 14px;display:flex;justify-content:space-between;align-items:center;}
+.lc-nm{font-size:0.95rem;color:var(--pa);font-weight:700;cursor:default;}
+.lc-r1{display:flex;gap:16px;padding:10px 14px 4px;flex-wrap:wrap;}
+.lc-r2{display:flex;gap:16px;padding:4px 14px 10px;flex-wrap:wrap;}
+.lc-it{display:flex;flex-direction:column;gap:1px;min-width:60px;}
+.lc-it label{font-size:0.65rem;font-weight:600;color:var(--tm);text-transform:uppercase;letter-spacing:0.05em;}
+.lc-it span{font-size:0.88rem;color:var(--tx);cursor:default;}
+.lc-obs{padding:7px 14px;font-size:0.76rem;color:var(--tm);border-top:1px solid var(--bd);cursor:default;}
+
 /* LOTES DESKTOP */
 .lt{width:100%;border-collapse:collapse;font-size:0.85rem;}
 .lt thead tr{background:var(--vc);color:var(--pa);}
 .lt th{padding:9px 12px;text-align:left;font-size:0.7rem;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;white-space:nowrap;}
 .lt td{padding:8px 12px;border-bottom:1px solid var(--bd);vertical-align:top;}
 .lt tr:nth-child(even) td{background:rgba(168,201,127,0.06);}
-.lt td:first-child{white-space:normal;}
 .ltc{cursor:default;}
-/* LOTES MOBILE */
-.lc{background:var(--fc);border:1px solid var(--bd);border-radius:10px;overflow:hidden;margin-bottom:10px;}
-.lc-hd{background:var(--vc);padding:10px 14px;display:flex;justify-content:space-between;align-items:center;}
-.lc-nm{font-size:0.95rem;color:var(--pa);font-weight:700;}
-.lc-bd{padding:12px 14px;display:flex;flex-direction:column;gap:8px;}
-.lc-it{display:flex;flex-direction:column;gap:2px;}
-.lc-it label{font-size:0.67rem;font-weight:600;color:var(--tm);text-transform:uppercase;letter-spacing:0.05em;}
-.lc-it span{font-size:0.88rem;color:var(--tx);}
-.lc-obs{padding:8px 14px;font-size:0.76rem;color:var(--tm);border-top:1px solid var(--bd);}
+
 /* PULV CARDS */
-.pc{background:var(--fc);border:1px solid var(--bd);border-radius:10px;overflow:hidden;margin-bottom:10px;}
-.pc-hd{background:var(--vc);padding:10px 14px;display:flex;justify-content:space-between;align-items:center;}
-.pc-dt{font-family:'JetBrains Mono',monospace;font-size:0.85rem;color:var(--pa);font-weight:600;}
-.pc-bd{padding:12px 14px;display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-.pc-it{display:flex;flex-direction:column;gap:2px;}
-.pc-it label{font-size:0.67rem;font-weight:600;color:var(--tm);text-transform:uppercase;letter-spacing:0.05em;}
-.pc-it .val{font-size:0.88rem;color:var(--tx);font-weight:500;}
-.pc-full{grid-column:1/-1;}
+.pc{background:var(--fc);border:1px solid var(--bd);border-radius:10px;overflow:hidden;margin-bottom:12px;}
+.pc-hd{background:var(--vc);padding:10px 16px;display:flex;justify-content:space-between;align-items:center;}
+.pc-dt{font-family:'JetBrains Mono',monospace;font-size:0.9rem;color:var(--pa);font-weight:600;}
+.pc-prods{padding:12px 16px;display:flex;flex-direction:column;gap:6px;}
+.pc-prod{display:flex;align-items:baseline;gap:8px;padding:5px 0;border-bottom:1px solid var(--bd);}
+.pc-prod:last-child{border-bottom:none;}
+.pc-prod .pnm{font-weight:500;font-size:0.88rem;flex:1;}
+.pc-prod .pdose{font-family:'JetBrains Mono',monospace;font-size:0.82rem;color:var(--tm);}
+.pc-prod .pvaz{font-family:'JetBrains Mono',monospace;font-size:0.82rem;color:var(--tm);}
+.prod-form{display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;background:var(--fn);border-radius:8px;padding:12px;margin-bottom:10px;}
+
 /* CHUVAS */
 .rynav{display:flex;align-items:center;gap:14px;margin-bottom:18px;}
 .rynav h2{font-family:'DM Serif Display',serif;font-size:1.3rem;color:var(--vc);min-width:55px;text-align:center;}
@@ -95,9 +103,10 @@ input:focus,select:focus{outline:none;border-color:var(--vl);}
 .dc input{width:100%;padding:3px 1px;text-align:center;font-family:'JetBrains Mono',monospace;font-size:0.78rem;border-radius:3px;border:1px solid var(--bd);background:var(--fn);}
 .dc input:focus{border-color:var(--vl);background:#fff;}
 .dc input.hr{background:rgba(90,160,60,0.12);border-color:var(--vs);}
+
 @media(max-width:600px){
   header{padding:12px 14px;}
-  main{padding:16px 10px;}
+  main{padding:14px 10px;}
   .nb{padding:10px 10px;font-size:0.76rem;}
   .mgrid{grid-template-columns:1fr;}
   .lt-wrap{display:none;}
@@ -122,6 +131,7 @@ input:focus,select:focus{outline:none;border-color:var(--vl);}
   <button class="nb" onclick="tab('chuvas',this)">🌧️ Chuvas</button>
 </nav>
 <main>
+
 <!-- ESTOQUE -->
 <div id="pg-estoque" class="pg on">
   <div class="ttl">Estoque de Insumos</div>
@@ -140,6 +150,7 @@ input:focus,select:focus{outline:none;border-color:var(--vl);}
   </div>
   <div id="i-list"><div class="empty">Nenhum produto cadastrado.</div></div>
 </div>
+
 <!-- LOTES -->
 <div id="pg-lotes" class="pg">
   <div class="ttl">Controle de Lotes</div>
@@ -166,24 +177,25 @@ input:focus,select:focus{outline:none;border-color:var(--vl);}
   </div>
   <div id="l-list"><div class="empty">Nenhum lote cadastrado ainda.</div></div>
 </div>
+
 <!-- PULV -->
 <div id="pg-pulv" class="pg">
   <div class="ttl">Controle de Pulverizações</div>
-  <p class="sub">Registro de aplicações — data, produtos, dose e vazão.</p>
+  <p class="sub">Cada aplicação pode ter múltiplos produtos.</p>
   <div class="card">
     <h3>Nova Aplicação</h3>
-    <div class="row">
-      <div class="fg" style="max-width:140px;flex:0 0 140px"><label>Data</label><input type="date" id="p-dt"/></div>
-      <div class="fg" style="flex:3"><label>Produto(s)</label><input type="text" id="p-pr" placeholder="Ex: Glifosato, Lorsban..."/></div>
+    <div class="row" style="margin-bottom:14px">
+      <div class="fg" style="max-width:160px;flex:0 0 160px"><label>Data da Aplicação</label><input type="date" id="p-dt"/></div>
     </div>
-    <div class="row">
-      <div class="fg"><label>Dose</label><input type="text" id="p-do" placeholder="Ex: 2 L/ha"/></div>
-      <div class="fg"><label>Vazão</label><input type="text" id="p-vz" placeholder="Ex: 150 L/ha"/></div>
-      <div class="fg" style="justify-content:flex-end"><button class="btn bp" onclick="W.addP()">+ Registrar</button></div>
+    <div id="p-prods-form"></div>
+    <div class="row" style="margin-bottom:10px">
+      <button class="btn bo" onclick="W.addProd()" style="padding:6px 14px;font-size:0.8rem">+ Adicionar Produto</button>
     </div>
+    <button class="btn bp" onclick="W.addP()" style="width:100%">✓ Registrar Aplicação</button>
   </div>
   <div id="p-list"><div class="empty">Nenhuma aplicação registrada.</div></div>
 </div>
+
 <!-- CHUVAS -->
 <div id="pg-chuvas" class="pg">
   <div class="ttl">Pluviometria — Lavoura</div>
@@ -203,23 +215,22 @@ input:focus,select:focus{outline:none;border-color:var(--vl);}
   <div class="rchart" id="r-chart"></div>
   <div class="mgrid" id="r-grid"></div>
 </div>
+
 </main>
 <script type="module">
 import{initializeApp}from'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
 import*as FS from'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
 const CFG={apiKey:"AIzaSyC3TgtAAa7QaCZavCeQ6ooMxzHnXDENNHA",authDomain:"alfafagestao.firebaseapp.com",projectId:"alfafagestao",storageBucket:"alfafagestao.firebasestorage.app",messagingSenderId:"460178234444",appId:"1:460178234444:web:74be3254797695daef68e9"};
-
 const MONTHS=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
 const WDAYS=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
 
 let insumos=[],lotes=[],pulvs=[],rain={},rYear=new Date().getFullYear();
+let prodLines=[{nm:'',dose:'',vaz:''}];
 const W=window.W={};
 
-// STATUS
 function ss(t,c){const e=document.getElementById('ss');e.textContent=t;e.className='sync'+(c?' '+c:'');}
 
-// TAB
 window.tab=function(id,btn){
   document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
   document.querySelectorAll('.nb').forEach(b=>b.classList.remove('on'));
@@ -233,18 +244,12 @@ let db;
 try{
   const app=initializeApp(CFG);
   db=FS.getFirestore(app);
-
-  // listen
   FS.onSnapshot(FS.collection(db,'insumos'),s=>{insumos=s.docs.map(d=>({id:d.id,...d.data()}));rI();});
   FS.onSnapshot(FS.collection(db,'lotes'),s=>{lotes=s.docs.map(d=>({...d.data()})).sort((a,b)=>b.id-a.id);rL();});
   FS.onSnapshot(FS.collection(db,'pulvs'),s=>{pulvs=s.docs.map(d=>({...d.data()})).sort((a,b)=>b.id-a.id);rP();});
   FS.onSnapshot(FS.collection(db,'rain'),s=>{rain={};s.docs.forEach(d=>{rain[d.id]=d.data().mm;});rRain();});
-
   ss('✓ Sincronizado','ok');
-}catch(e){
-  ss('✗ Erro','err');
-  console.error(e);
-}
+}catch(e){ss('✗ Erro Firebase','err');console.error(e);}
 
 const up=async(col,id,data)=>FS.setDoc(FS.doc(db,col,String(id)),{...data,_ts:FS.serverTimestamp()});
 const rm=async(col,id)=>FS.deleteDoc(FS.doc(db,col,String(id)));
@@ -339,6 +344,7 @@ function rL(){
   const w=document.getElementById('l-list');
   if(!tot){w.innerHTML='<div class="empty">Nenhum lote cadastrado ainda.</div>';return;}
   const fd=v=>v?new Date(v+'T00:00').toLocaleDateString('pt-BR'):'—';
+
   // MOBILE CARDS
   const cards=lotes.map(l=>`
     <div class="lc">
@@ -346,15 +352,18 @@ function rL(){
         <div class="lc-nm" ondblclick="W.editL(this,'${l.id}','nm','text')">${l.nm||'—'}</div>
         <button class="btn bd2" onclick="W.delL('${l.id}')">✕</button>
       </div>
-      <div class="lc-bd">
+      <div class="lc-r1">
         <div class="lc-it" ondblclick="W.editL(this,'${l.id}','dt','date')"><label>Data</label><span class="ltd">${fd(l.dt)}</span></div>
         <div class="lc-it" ondblclick="W.editL(this,'${l.id}','co','number')"><label>Corte</label><span class="ltd">${l.co||1}º</span></div>
         <div class="lc-it" ondblclick="W.editL(this,'${l.id}','ta','text')"><label>Talhão</label><span class="ltd">${l.ta||'—'}</span></div>
-        <div class="lc-it" ondblclick="W.editL(this,'${l.id}','nb','number')"><label>Qtd de Bolas</label><span class="ltd">${l.nb||'—'}</span></div>
-        <div class="lc-it" ondblclick="W.editL(this,'${l.id}','pm','number')"><label>Peso Médio (kg)</label><span class="ltd" style="color:var(--vc);font-weight:700">${l.pm||'—'}</span></div>
+      </div>
+      <div class="lc-r2">
+        <div class="lc-it" ondblclick="W.editL(this,'${l.id}','nb','number')"><label>Bolas</label><span class="ltd" style="font-family:'JetBrains Mono',monospace">${l.nb||'—'}</span></div>
+        <div class="lc-it" ondblclick="W.editL(this,'${l.id}','pm','number')"><label>Peso Médio (kg)</label><span class="ltd" style="font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--vc)">${l.pm||'—'}</span></div>
       </div>
       ${l.ob?`<div class="lc-obs" ondblclick="W.editL(this,'${l.id}','ob','text')"><strong>Obs:</strong> ${l.ob}</div>`:`<div class="lc-obs" style="color:var(--bd)" ondblclick="W.editL(this,'${l.id}','ob','text')">+ obs</div>`}
     </div>`).join('');
+
   // DESKTOP TABLE
   const rows=lotes.map(l=>`
     <tr>
@@ -369,6 +378,7 @@ function rL(){
       <td class="ltc" style="text-align:right" ondblclick="W.editL(this,'${l.id}','pm','number')"><span class="ltd" style="font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--vc)">${l.pm||'—'}</span></td>
       <td><button class="btn bd2" onclick="W.delL('${l.id}')">✕</button></td>
     </tr>`).join('');
+
   w.innerHTML=`
     <div class="lc-wrap">${cards}<div style="font-size:0.7rem;color:var(--tm);text-align:center;padding:4px">Duplo toque para editar</div></div>
     <div class="lt-wrap">
@@ -382,16 +392,29 @@ function rL(){
     </div>`;
 }
 
-// ── PULV ──
+// ── PULVERIZAÇÕES ──
+function rProdForm(){
+  const w=document.getElementById('p-prods-form');
+  w.innerHTML=prodLines.map((p,i)=>`
+    <div class="prod-form">
+      <div class="fg" style="flex:2;min-width:140px"><label>Produto</label><input type="text" value="${p.nm}" placeholder="Ex: Glifosato" oninput="W.updProd(${i},'nm',this.value)"/></div>
+      <div class="fg" style="min-width:90px"><label>Dose</label><input type="text" value="${p.dose}" placeholder="Ex: 2 L/ha" oninput="W.updProd(${i},'dose',this.value)"/></div>
+      <div class="fg" style="min-width:90px"><label>Vazão</label><input type="text" value="${p.vaz}" placeholder="Ex: 150 L/ha" oninput="W.updProd(${i},'vaz',this.value)"/></div>
+      ${i>0?`<button class="btn bd2" style="align-self:flex-end" onclick="W.remProd(${i})">✕</button>`:''}
+    </div>`).join('');
+}
+W.updProd=(i,f,v)=>{prodLines[i][f]=v;};
+W.addProd=()=>{prodLines.push({nm:'',dose:'',vaz:''});rProdForm();};
+W.remProd=(i)=>{prodLines.splice(i,1);rProdForm();};
 W.addP=async()=>{
   const dt=document.getElementById('p-dt').value;
-  const pr=document.getElementById('p-pr').value.trim();
-  const dz=document.getElementById('p-do').value.trim();
-  const vz=document.getElementById('p-vz').value.trim();
-  if(!dt||!pr){alert('Informe a data e o produto.');return;}
+  const prods=prodLines.filter(p=>p.nm.trim());
+  if(!dt){alert('Informe a data.');return;}
+  if(!prods.length){alert('Adicione pelo menos um produto.');return;}
   const id=Date.now();
-  await up('pulvs',id,{id,dt,pr,dz,vz});
-  ['p-pr','p-do','p-vz'].forEach(k=>document.getElementById(k).value='');
+  await up('pulvs',id,{id,dt,prods});
+  prodLines=[{nm:'',dose:'',vaz:''}];
+  rProdForm();
 };
 W.delP=async id=>{if(!confirm('Remover?'))return;await rm('pulvs',id);};
 function rP(){
@@ -403,10 +426,13 @@ function rP(){
         <span class="pc-dt">📅 ${p.dt?new Date(p.dt+'T00:00').toLocaleDateString('pt-BR'):'—'}</span>
         <button class="btn bd2" onclick="W.delP('${p.id}')">✕</button>
       </div>
-      <div class="pc-bd">
-        <div class="pc-it pc-full"><label>Produto(s)</label><div class="val">${p.pr}</div></div>
-        <div class="pc-it"><label>Dose</label><div class="val">${p.dz||'—'}</div></div>
-        <div class="pc-it"><label>Vazão</label><div class="val">${p.vz||'—'}</div></div>
+      <div class="pc-prods">
+        ${(p.prods||[{nm:p.pr,dose:p.dz,vaz:p.vz}]).map(pr=>`
+        <div class="pc-prod">
+          <span class="pnm">${pr.nm||pr.produto||'—'}</span>
+          ${pr.dose||pr.dz?`<span class="pdose">${pr.dose||pr.dz}</span>`:''}
+          ${pr.vaz||pr.vz?`<span class="pvaz">/ ${pr.vaz||pr.vz}</span>`:''}
+        </div>`).join('')}
       </div>
     </div>`).join('');
 }
@@ -441,10 +467,7 @@ function updRChart(){
   const tots=Array.from({length:12},(_,m)=>mTot(rYear,m));
   const mx=Math.max(...tots,1);
   document.getElementById('r-chart').innerHTML=tots.map((t,m)=>`
-    <div class="rb-w" title="${MONTHS[m]}: ${t.toFixed(1)}mm">
-      <div class="rb" style="height:${Math.round((t/mx)*70)}px"></div>
-      <div class="rb-l">${MONTHS[m].slice(0,3)}</div>
-    </div>`).join('');
+    <div class="rb-w"><div class="rb" style="height:${Math.round((t/mx)*70)}px"></div><div class="rb-l">${MONTHS[m].slice(0,3)}</div></div>`).join('');
 }
 function rRain(){
   document.getElementById('r-yr').textContent=rYear;
@@ -464,6 +487,7 @@ function rRain(){
 // INIT
 document.getElementById('l-dt').value=new Date().toISOString().slice(0,10);
 document.getElementById('p-dt').value=new Date().toISOString().slice(0,10);
+rProdForm();
 </script>
 </body>
 </html>
