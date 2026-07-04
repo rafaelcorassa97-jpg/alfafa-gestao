@@ -199,10 +199,10 @@ input:focus,select:focus{outline:none;border-color:var(--vl);}
   <p class="sub">Cada aplicação pode ter múltiplos produtos.</p>
   <div class="card">
     <h3>Nova Aplicação</h3>
-    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:14px">
-      <div class="fg"><label>Data</label><input type="date" id="p-dt"/></div>
-      <div class="fg"><label>Vazão (L/ha)</label><input type="number" id="p-vz" placeholder="Ex: 150" step="0.1" min="0" onblur="W.recalc()" onchange="W.recalc()"/></div>
-      <div class="fg"><label>Área (ha)</label><input type="number" id="p-ar" placeholder="Ex: 10" step="0.1" min="0" onblur="W.recalc()" onchange="W.recalc()"/></div>
+    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:14px;width:100%">
+      <div style="display:flex;flex-direction:column;gap:3px;width:100%"><label style="font-size:0.72rem;font-weight:500;color:var(--tm);text-transform:uppercase;letter-spacing:0.05em">Data</label><input type="date" id="p-dt" style="width:100%"/></div>
+      <div style="display:flex;flex-direction:column;gap:3px;width:100%"><label style="font-size:0.72rem;font-weight:500;color:var(--tm);text-transform:uppercase;letter-spacing:0.05em">Vazão (L/ha)</label><input type="number" id="p-vz" placeholder="Ex: 150" step="0.1" min="0" onblur="W.recalc()" onchange="W.recalc()" style="width:100%"/></div>
+      <div style="display:flex;flex-direction:column;gap:3px;width:100%"><label style="font-size:0.72rem;font-weight:500;color:var(--tm);text-transform:uppercase;letter-spacing:0.05em">Área (ha)</label><input type="number" id="p-ar" placeholder="Ex: 10" step="0.1" min="0" onblur="W.recalc()" onchange="W.recalc()" style="width:100%"/></div>
     </div>
     <div id="p-prods-form"></div>
     <div class="row" style="margin-bottom:10px">
