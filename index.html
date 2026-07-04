@@ -73,14 +73,20 @@ input:focus,select:focus{outline:none;border-color:var(--vl);}
 /* PULV CARDS */
 .pc{background:var(--fc);border:1px solid var(--bd);border-radius:10px;overflow:hidden;margin-bottom:12px;}
 .pc-hd{background:var(--vc);padding:10px 16px;display:flex;justify-content:space-between;align-items:center;}
+.pc-hd-info{display:flex;flex-direction:column;gap:2px;}
 .pc-dt{font-family:'JetBrains Mono',monospace;font-size:0.9rem;color:var(--pa);font-weight:600;}
-.pc-prods{padding:12px 16px;display:flex;flex-direction:column;gap:6px;}
-.pc-prod{display:flex;align-items:baseline;gap:8px;padding:5px 0;border-bottom:1px solid var(--bd);}
+.pc-meta{font-size:0.72rem;color:var(--vs);}
+.pc-prods{padding:12px 16px;display:flex;flex-direction:column;gap:0;}
+.pc-prod{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid var(--bd);}
 .pc-prod:last-child{border-bottom:none;}
-.pc-prod .pnm{font-weight:500;font-size:0.88rem;flex:1;}
-.pc-prod .pdose{font-family:'JetBrains Mono',monospace;font-size:0.82rem;color:var(--tm);}
-.pc-prod .pvaz{font-family:'JetBrains Mono',monospace;font-size:0.82rem;color:var(--tm);}
+.pc-prod .pnm{font-weight:500;font-size:0.88rem;}
+.pc-prod .pdose{font-family:'JetBrains Mono',monospace;font-size:0.8rem;color:var(--tm);text-align:right;}
+.pc-prod .pvol{font-family:'JetBrains Mono',monospace;font-size:0.82rem;color:var(--vc);font-weight:700;text-align:right;white-space:nowrap;}
+.pc-prod-hdr{display:grid;grid-template-columns:1fr auto auto;gap:8px;padding:4px 0 6px;border-bottom:2px solid var(--bd);margin-bottom:2px;}
+.pc-prod-hdr span{font-size:0.68rem;font-weight:600;color:var(--tm);text-transform:uppercase;letter-spacing:0.05em;}
+.pc-prod-hdr span:nth-child(2),.pc-prod-hdr span:nth-child(3){text-align:right;}
 .prod-form{display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;background:var(--fn);border-radius:8px;padding:12px;margin-bottom:10px;}
+.vol-calc{font-size:0.78rem;color:var(--vc);font-weight:600;margin-top:2px;}
 
 /* CHUVAS */
 .rynav{display:flex;align-items:center;gap:14px;margin-bottom:18px;}
@@ -184,8 +190,10 @@ input:focus,select:focus{outline:none;border-color:var(--vl);}
   <p class="sub">Cada aplicação pode ter múltiplos produtos.</p>
   <div class="card">
     <h3>Nova Aplicação</h3>
-    <div class="row" style="margin-bottom:14px">
-      <div class="fg" style="max-width:160px;flex:0 0 160px"><label>Data da Aplicação</label><input type="date" id="p-dt"/></div>
+    <div class="row" style="margin-bottom:10px">
+      <div class="fg" style="max-width:150px;flex:0 0 150px"><label>Data</label><input type="date" id="p-dt"/></div>
+      <div class="fg" style="max-width:120px"><label>Vazão (L/ha)</label><input type="number" id="p-vz" placeholder="Ex: 150" step="0.1" min="0" oninput="W.recalc()"/></div>
+      <div class="fg" style="max-width:120px"><label>Área (ha)</label><input type="number" id="p-ar" placeholder="Ex: 10" step="0.1" min="0" oninput="W.recalc()"/></div>
     </div>
     <div id="p-prods-form"></div>
     <div class="row" style="margin-bottom:10px">
@@ -226,7 +234,7 @@ const MONTHS=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Ago
 const WDAYS=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
 
 let insumos=[],lotes=[],pulvs=[],rain={},rYear=new Date().getFullYear();
-let prodLines=[{nm:'',dose:'',vaz:''}];
+let prodLines=[{nm:'',dose:''}];
 const W=window.W={};
 
 function ss(t,c){const e=document.getElementById('ss');e.textContent=t;e.className='sync'+(c?' '+c:'');}
@@ -411,27 +419,54 @@ function rL(){
 }
 
 // ── PULVERIZAÇÕES ──
+function calcVol(dose, area) {
+  // dose pode ser "2 L/ha" ou "2" — extrai o número
+  const d = parseFloat(String(dose).replace(',','.'));
+  const a = parseFloat(String(area).replace(',','.'));
+  if (isNaN(d) || isNaN(a) || a === 0) return null;
+  return (d * a).toFixed(1);
+}
+
 function rProdForm(){
-  const w=document.getElementById('p-prods-form');
-  w.innerHTML=prodLines.map((p,i)=>`
+  const vz = parseFloat(document.getElementById('p-vz').value) || 0;
+  const ar = parseFloat(document.getElementById('p-ar').value) || 0;
+  const w = document.getElementById('p-prods-form');
+  w.innerHTML = prodLines.map((p,i) => {
+    const vol = calcVol(p.dose, ar);
+    return `
     <div class="prod-form">
       <div class="fg" style="flex:2;min-width:140px"><label>Produto</label><input type="text" value="${p.nm}" placeholder="Ex: Glifosato" oninput="W.updProd(${i},'nm',this.value)"/></div>
-      <div class="fg" style="min-width:90px"><label>Dose</label><input type="text" value="${p.dose}" placeholder="Ex: 2 L/ha" oninput="W.updProd(${i},'dose',this.value)"/></div>
-      <div class="fg" style="min-width:90px"><label>Vazão</label><input type="text" value="${p.vaz}" placeholder="Ex: 150 L/ha" oninput="W.updProd(${i},'vaz',this.value)"/></div>
+      <div class="fg" style="min-width:100px"><label>Dose (L/ha ou kg/ha)</label><input type="number" step="0.01" value="${p.dose}" placeholder="Ex: 2" oninput="W.updProd(${i},'dose',this.value)"/></div>
+      <div class="fg" style="min-width:100px">
+        <label>Vol. no Tanque (L)</label>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:1rem;font-weight:700;color:var(--vc);padding:7px 0">
+          ${vol !== null ? vol + ' L' : ar > 0 ? '—' : 'informe área'}
+        </div>
+      </div>
       ${i>0?`<button class="btn bd2" style="align-self:flex-end" onclick="W.remProd(${i})">✕</button>`:''}
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
-W.updProd=(i,f,v)=>{prodLines[i][f]=v;};
-W.addProd=()=>{prodLines.push({nm:'',dose:'',vaz:''});rProdForm();};
+W.recalc=()=>{rProdForm();};
+W.updProd=(i,f,v)=>{prodLines[i][f]=v;rProdForm();};
+W.addProd=()=>{prodLines.push({nm:'',dose:''});rProdForm();};
 W.remProd=(i)=>{prodLines.splice(i,1);rProdForm();};
 W.addP=async()=>{
-  const dt=document.getElementById('p-dt').value;
-  const prods=prodLines.filter(p=>p.nm.trim());
+  const dt  = document.getElementById('p-dt').value;
+  const vz  = parseFloat(document.getElementById('p-vz').value) || 0;
+  const ar  = parseFloat(document.getElementById('p-ar').value) || 0;
+  const prods = prodLines.filter(p=>p.nm.trim()).map(p=>({
+    nm: p.nm.trim(),
+    dose: p.dose,
+    vol: calcVol(p.dose, ar)
+  }));
   if(!dt){alert('Informe a data.');return;}
   if(!prods.length){alert('Adicione pelo menos um produto.');return;}
   const id=Date.now();
-  await up('pulvs',id,{id,dt,prods});
-  prodLines=[{nm:'',dose:'',vaz:''}];
+  await up('pulvs',id,{id,dt,vz,ar,prods});
+  prodLines=[{nm:'',dose:''}];
+  document.getElementById('p-vz').value='';
+  document.getElementById('p-ar').value='';
   rProdForm();
 };
 W.delP=async id=>{if(!confirm('Remover?'))return;await rm('pulvs',id);};
@@ -441,15 +476,21 @@ function rP(){
   w.innerHTML=pulvs.map(p=>`
     <div class="pc">
       <div class="pc-hd">
-        <span class="pc-dt">📅 ${p.dt?new Date(p.dt+'T00:00').toLocaleDateString('pt-BR'):'—'}</span>
+        <div class="pc-hd-info">
+          <span class="pc-dt">📅 ${p.dt?new Date(p.dt+'T00:00').toLocaleDateString('pt-BR'):'—'}</span>
+          <span class="pc-meta">${p.ar?p.ar+' ha':''} ${p.vz?'· Vazão: '+p.vz+' L/ha':''}</span>
+        </div>
         <button class="btn bd2" onclick="W.delP('${p.id}')">✕</button>
       </div>
       <div class="pc-prods">
-        ${(p.prods||[{nm:p.pr,dose:p.dz,vaz:p.vz}]).map(pr=>`
+        <div class="pc-prod-hdr">
+          <span>Produto</span><span>Dose</span><span>Vol. Tanque</span>
+        </div>
+        ${(p.prods||[]).map(pr=>`
         <div class="pc-prod">
-          <span class="pnm">${pr.nm||pr.produto||'—'}</span>
-          ${pr.dose||pr.dz?`<span class="pdose">${pr.dose||pr.dz}</span>`:''}
-          ${pr.vaz||pr.vz?`<span class="pvaz">/ ${pr.vaz||pr.vz}</span>`:''}
+          <span class="pnm">${pr.nm||'—'}</span>
+          <span class="pdose">${pr.dose?pr.dose+' L/ha':''}</span>
+          <span class="pvol">${pr.vol?pr.vol+' L':'—'}</span>
         </div>`).join('')}
       </div>
     </div>`).join('');
