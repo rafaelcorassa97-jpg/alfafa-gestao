@@ -281,15 +281,33 @@ W.saveI=async function(id){
   const ins=insumos.find(i=>String(i.id)===String(id));
   if(!isNaN(v)&&ins)await up('insumos',id,{...ins,qt:Math.max(0,v)});
 };
+W.editI=function(el,id,field,type){
+  if(el.querySelector('input'))return;
+  const ins=insumos.find(i=>String(i.id)===String(id));
+  const cur=ins?ins[field]:'';
+  const inp=document.createElement('input');
+  inp.type=type||'text';
+  inp.value=cur||'';
+  inp.style.cssText='font-family:inherit;font-size:0.88rem;border:1px solid var(--vl);border-radius:4px;padding:2px 6px;width:100%;background:#fff;outline:none;';
+  el.textContent='';
+  el.appendChild(inp);inp.focus();if(inp.select)inp.select();
+  const done=async()=>{
+    const u={...ins};u[field]=inp.value.trim();
+    if(u[field])await up('insumos',id,u);
+    else rI();
+  };
+  inp.addEventListener('blur',done);
+  inp.addEventListener('keydown',e=>{if(e.key==='Enter')inp.blur();if(e.key==='Escape'){inp.removeEventListener('blur',done);rI();}});
+};
 function rI(){
   document.getElementById('st-tot').textContent=insumos.length;
   const w=document.getElementById('i-list');
   if(!insumos.length){w.innerHTML='<div class="empty">Nenhum produto cadastrado.</div>';return;}
   w.innerHTML='<div class="ilist">'+insumos.map(i=>`
     <div class="irow" id="ir-${i.id}">
-      <div class="nm">${i.nm}</div>
+      <div class="nm ltc" ondblclick="W.editI(this,'${i.id}','nm','text')">${i.nm}</div>
       <div class="qt">${(+i.qt).toLocaleString('pt-BR',{maximumFractionDigits:2})}</div>
-      <div class="un">${i.un}</div>
+      <div class="un ltc" ondblclick="W.editI(this,'${i.id}','un','text')">${i.un}</div>
       <button class="adj" onclick="W.adjI('${i.id}')">± ajustar</button>
       <button class="del" onclick="W.delI('${i.id}')">✕</button>
     </div>`).join('')+'</div>';
